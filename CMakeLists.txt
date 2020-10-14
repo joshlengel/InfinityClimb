@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.12)
 
 project(InfinityClimb VERSION 1.0)
 
@@ -6,7 +6,17 @@ project(InfinityClimb VERSION 1.0)
 set(IC_ROOT "${CMAKE_CURRENT_SOURCE_DIR}")
 set(IC_DEPS "${IC_ROOT}/deps")
 
-file(GLOB_RECURSE sources "${IC_ROOT}/src/**.cpp")
+set(sources
+    "Main.c"
+    "Libs.c"
+    "Log.c"
+    "window/Window.c"
+    "window/Context.c"
+    "world/Rect.c"
+    "world/Shader.c"
+)
+
+list(TRANSFORM sources PREPEND "${IC_ROOT}/src/")
 include_directories("${IC_ROOT}/include" "${IC_ROOT}/src")
 
 # Dependencies

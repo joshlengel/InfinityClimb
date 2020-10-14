@@ -2,5 +2,11 @@
 /build/*
 /bin/*
 
+# Logs
+log/*
+logs/*
+*.log
+*log.*
+
 # Visual Studio Code
 /.vscode/*
