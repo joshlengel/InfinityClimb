@@ -10,6 +10,7 @@ set(sources
     "Main.c"
     "Libs.c"
     "Log.c"
+    "Utils.c"
     "window/Window.c"
     "window/Context.c"
     "world/Rect.c"
