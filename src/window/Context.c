@@ -1,6 +1,14 @@
-#include"window/Context.h"
-
 #include<glad/glad.h>
+
+void context_init()
+{
+    glEnable(GL_DEPTH_TEST);
+}
+
+void context_terminate()
+{
+
+}
 
 void context_background_color(float r, float g, float b, float a)
 {

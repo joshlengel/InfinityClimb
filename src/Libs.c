@@ -1,5 +1,6 @@
-#include"Libs.h"
 #include"Log_Mmt.h"
+
+#include"Core.h"
 
 #define GLFW_INCLUDE_NONE
 #include<GLFW/glfw3.h>
@@ -20,7 +21,7 @@ IC_ERROR_CODE load_libs()
 
 void terminate_libs()
 {
-    glfwTerminate();
-
     log_terminate();
+
+    glfwTerminate();
 }

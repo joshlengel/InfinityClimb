@@ -1,15 +1,11 @@
 #include"window/Window.h"
+#include"window/Window_Mmt.h"
 
 #define GLFW_INCLUDE_NONE
 #include<GLFW/glfw3.h>
 #include<glad/glad.h>
 
 #include<stdlib.h>
-
-struct Window_Data
-{
-    GLFWwindow *handle;
-};
 
 IC_ERROR_CODE window_create(Window *dest)
 {
@@ -44,6 +40,15 @@ void window_destroy(const Window *window)
     glfwDestroyWindow(window->data->handle);
 
     free((void*)window->data);
+}
+
+float window_aspect_ratio(const Window *window)
+{
+    int width[1];
+    int height[1];
+    glfwGetWindowSize(window->data->handle, width, height);
+
+    return (float) width[0] / (float) height[0];
 }
 
 void window_show(const Window *window)

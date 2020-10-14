@@ -22,41 +22,61 @@ void rect_create(Rect *dest)
     glBindVertexArray(data->vao_id);
 
     float vertices[] =
-    {
-        -1.0f, -1.0f, -1.0f,
-         1.0f, -1.0f, -1.0f,
-        -1.0f,  1.0f, -1.0f,
-         1.0f,  1.0f, -1.0f,
-        -1.0f, -1.0f,  1.0f,
-         1.0f, -1.0f,  1.0f,
-        -1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f
+    { //       vertex                   normal
+        -1.0f, -1.0f, -1.0f,      0.0f,  0.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,      0.0f,  0.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,      0.0f,  0.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,      0.0f,  0.0f, -1.0f,
+         1.0f, -1.0f,  1.0f,      0.0f,  0.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,      0.0f,  0.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,      0.0f,  0.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,      0.0f,  0.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,     -1.0f,  0.0f,  0.0f,
+        -1.0f, -1.0f, -1.0f,     -1.0f,  0.0f,  0.0f,
+        -1.0f,  1.0f,  1.0f,     -1.0f,  0.0f,  0.0f,
+        -1.0f,  1.0f, -1.0f,     -1.0f,  0.0f,  0.0f,
+         1.0f, -1.0f, -1.0f,      1.0f,  0.0f,  0.0f,
+         1.0f, -1.0f,  1.0f,      1.0f,  0.0f,  0.0f,
+         1.0f,  1.0f, -1.0f,      1.0f,  0.0f,  0.0f,
+         1.0f,  1.0f,  1.0f,      1.0f,  0.0f,  0.0f,
+        -1.0f, -1.0f,  1.0f,      0.0f, -1.0f,  0.0f,
+         1.0f, -1.0f,  1.0f,      0.0f, -1.0f,  0.0f,
+        -1.0f, -1.0f, -1.0f,      0.0f, -1.0f,  0.0f,
+         1.0f, -1.0f, -1.0f,      0.0f, -1.0f,  0.0f,
+        -1.0f,  1.0f, -1.0f,      0.0f,  1.0f,  0.0f,
+         1.0f,  1.0f, -1.0f,      0.0f,  1.0f,  0.0f,
+        -1.0f,  1.0f,  1.0f,      0.0f,  1.0f,  0.0f,
+         1.0f,  1.0f,  1.0f,      0.0f,  1.0f,  0.0f
     };
+
+    GLsizei stride = sizeof(float) * 6; 
 
     glBindBuffer(GL_ARRAY_BUFFER, data->v_buff_id);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(sizeof(float) * 3));
     glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
 
     uint8_t indices[] =
     {
         0, 1, 3,
         0, 3, 2,
 
-        5, 4, 6,
-        5, 6, 7,
+        4, 5, 7,
+        4, 7, 6,
 
-        4, 0, 2,
-        4, 2, 6,
+        8, 9, 11,
+        8, 11, 10,
 
-        1, 5, 7,
-        1, 7, 3,
+        12, 13, 15,
+        12, 15, 14,
 
-        4, 5, 1,
-        4, 1, 0,
+        16, 17, 19,
+        16, 19, 18,
 
-        2, 3, 7,
-        2, 7, 6
+        20, 21, 23,
+        20, 23, 22
     };
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, data->i_buff_id);

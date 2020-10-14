@@ -11,10 +11,14 @@ set(sources
     "Libs.c"
     "Log.c"
     "Utils.c"
+    "math/Vec.c"
+    "math/Mat.c"
     "window/Window.c"
+    "window/Input.c"
     "window/Context.c"
     "world/Rect.c"
     "world/Shader.c"
+    "world/Camera.c"
 )
 
 list(TRANSFORM sources PREPEND "${IC_ROOT}/src/")
