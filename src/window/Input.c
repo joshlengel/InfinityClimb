@@ -62,8 +62,8 @@ const int IC_TO_GLFW_MOUSE_BUTTON[IC_MOUSE_BUTTON_LAST] =
 
 IC_ERROR_CODE input_create(Input *input)
 {
-    memset(input->keys, 0, sizeof(input->keys));
-    memset(input->mouse_buttons, 0, sizeof(input->mouse_buttons));
+    memset(input->_keys, 0, sizeof(input->_keys));
+    memset(input->_mouse_buttons, 0, sizeof(input->_mouse_buttons));
 
     return IC_NO_ERROR;
 }
@@ -75,8 +75,8 @@ void input_destroy(const Input *input)
 
 void input_update(Input *input)
 {
-    for (IC_KEY key = 0; key < IC_KEY_LAST; ++key) input->keys[key] = input_key_down(input, key);
-    for (IC_MOUSE_BUTTON mouse_button = 0; mouse_button < IC_MOUSE_BUTTON_LAST; ++mouse_button) input->mouse_buttons[mouse_button] = input_mouse_button_down(input, mouse_button);
+    for (IC_KEY key = 0; key < IC_KEY_LAST; ++key) input->_keys[key] = input_key_down(input, key);
+    for (IC_MOUSE_BUTTON mouse_button = 0; mouse_button < IC_MOUSE_BUTTON_LAST; ++mouse_button) input->_mouse_buttons[mouse_button] = input_mouse_button_down(input, mouse_button);
 }
 
 IC_BOOL input_key_down(const Input *input, IC_KEY key)
@@ -94,12 +94,12 @@ IC_BOOL input_key_down(const Input *input, IC_KEY key)
 
 IC_BOOL input_key_pressed(const Input *input, IC_KEY key)
 {
-    return input_key_down(input, key) && !input->keys[key];
+    return input_key_down(input, key) && !input->_keys[key];
 }
 
 IC_BOOL input_key_released(const Input *input, IC_KEY key)
 {
-    return !input_key_down(input, key) && input->keys[key];
+    return !input_key_down(input, key) && input->_keys[key];
 }
 
 IC_BOOL input_mouse_button_down(const Input *input, IC_MOUSE_BUTTON mouse_button)
@@ -109,10 +109,10 @@ IC_BOOL input_mouse_button_down(const Input *input, IC_MOUSE_BUTTON mouse_button
 
 IC_BOOL input_mouse_button_pressed(const Input *input, IC_MOUSE_BUTTON mouse_button)
 {
-    return input_mouse_button_down(input, mouse_button) && !input->mouse_buttons[mouse_button];
+    return input_mouse_button_down(input, mouse_button) && !input->_mouse_buttons[mouse_button];
 }
 
 IC_BOOL input_mouse_button_released(const Input *input, IC_MOUSE_BUTTON mouse_button)
 {
-    return !input_mouse_button_down(input, mouse_button) && input->mouse_buttons[mouse_button];
+    return !input_mouse_button_down(input, mouse_button) && input->_mouse_buttons[mouse_button];
 }

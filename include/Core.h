@@ -10,6 +10,7 @@
 
 #ifdef __APPLE__
     #define IC_APPLE
+    #error Apple platform unsupported
 #endif // __APPLE__
 
 #if !defined(IC_WINDOWS) && !defined(IC_LINUX) && !defined(IC_APPLE)

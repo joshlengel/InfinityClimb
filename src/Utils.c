@@ -7,6 +7,12 @@
 #include<string.h>
 #include<assert.h>
 
+#ifdef IC_WINDOWS
+    #include<Windows.h>
+#elif defined(IC_LINUX)
+    #include<sys/time.h>
+#endif // IC_WINDOWS
+
 const int MAX_BUFFER_SIZE = 256;
 
 const char *read_source(const char *path, IC_ERROR_CODE *error_code)
@@ -173,4 +179,49 @@ void loader_unload(Loader *loader)
 IC_ERROR_CODE loader_error(const Loader *loader)
 {
     return loader->data->error_code;
+}
+
+IC_ERROR_CODE timer_create(Timer *dest)
+{
+    dest->_frame_length = (uint64_t)1000000000L / (uint64_t)dest->fps;
+    return IC_NO_ERROR;
+}
+
+void timer_destroy(const Timer *timer)
+{}
+
+uint64_t __timer_get_time_impl()
+{
+#ifdef IC_LINUX
+    struct timeval now;
+    gettimeofday(&now, NULL);
+
+    return (uint64_t)now.tv_sec * (uint64_t)1000000000L + (uint64_t)now.tv_usec * (uint64_t)1000L;
+#endif // IC_LINUX
+    // TODO: Add more platforms
+}
+
+void timer_start(Timer *timer)
+{
+    timer->_time_start = __timer_get_time_impl();
+}
+
+IC_BOOL timer_should_update(Timer *timer)
+{
+    uint64_t now = __timer_get_time_impl();
+    uint64_t diff = now - timer->_time_start;
+
+    if (diff > timer->_frame_length)
+    {
+        timer->_time_start = now;
+        timer->_diff = (float)((double)diff * 1E-9); // double cast first to improve conversion accuracy
+        return IC_TRUE;
+    }
+
+    return IC_FALSE;
+}
+
+float scale_speed(const Timer *timer, float speed)
+{
+    return speed * timer->_diff;
 }

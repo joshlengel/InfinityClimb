@@ -59,8 +59,9 @@ typedef struct _Window Window;
 struct _Input
 {
     const Window *window;
-    IC_BOOL keys[IC_KEY_LAST];
-    IC_BOOL mouse_buttons[IC_MOUSE_BUTTON_LAST];
+    
+    IC_BOOL _keys[IC_KEY_LAST];
+    IC_BOOL _mouse_buttons[IC_MOUSE_BUTTON_LAST];
 };
 
 typedef struct _Input Input;

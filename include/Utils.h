@@ -4,8 +4,10 @@
 
 #include<stdint.h>
 
+// Read source
 const char *read_source(const char *path, IC_ERROR_CODE *error_code);
 
+// Loader
 typedef struct _Loader_Data Loader_Data;
 
 struct _Loader
@@ -26,3 +28,22 @@ void loader_add_resource(const Loader *loader, void *resource, Loader_Init_proc 
 void loader_load(Loader *loader);
 void loader_unload(Loader *loader);
 IC_ERROR_CODE loader_error(const Loader *loader);
+
+// Timer
+struct _Timer
+{
+    uint16_t fps;
+
+    uint64_t _time_start;
+    uint64_t _frame_length;
+    float _diff;
+};
+
+typedef struct _Timer Timer;
+
+IC_ERROR_CODE timer_create(Timer *dest);
+void timer_destroy(const Timer *timer);
+
+void timer_start(Timer *timer);
+IC_BOOL timer_should_update(Timer *timer);
+float scale_speed(const Timer *timer, float speed);

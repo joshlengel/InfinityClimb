@@ -15,6 +15,7 @@
 #include<math.h>
 
 Loader loader;
+Timer timer;
     
 Window window;
 Context context;
@@ -25,8 +26,10 @@ Shader shader;
 Camera camera;
 
 Vec3 LIGHT_DIR = { -0.2f, -0.8f, 0.4f };
-
 Color SKY_COLOR;
+
+const float CAM_MOVE_SPEED = 0.7f;
+const float CAM_ROTATE_SPEED = 2.0f;
 
 int init()
 {
@@ -38,6 +41,9 @@ int init()
         log_trace("Error loading libs. Error code: %i", ec);
         return -1;
     }
+
+    // Timer
+    timer.fps = 120;
 
     // Window
     window.width = 800;
@@ -70,9 +76,10 @@ int init()
     rect.scale = rect_scale;
 
     // Loader
-    loader.num_resources = 5;
+    loader.num_resources = 6;
 
     loader_create(&loader);
+    loader_add_resource(&loader, &timer,   (Loader_Init_proc)timer_create,   (Loader_Dest_proc)timer_destroy);
     loader_add_resource(&loader, &window,  (Loader_Init_proc)window_create,  (Loader_Dest_proc)window_destroy);
     loader_add_resource(&loader, &input,   (Loader_Init_proc)input_create,   (Loader_Dest_proc)input_destroy);
     loader_add_resource(&loader, &context, (Loader_Init_proc)context_create, (Loader_Dest_proc)context_destroy);
@@ -122,30 +129,39 @@ int main(int argc, char **argv)
     }
     
     window_show(&window);
+    timer_start(&timer);
 
     while(!window_should_close(&window))
     {
+        if (!timer_should_update(&timer)) continue;
+
+        // Update input
         input_update(&input);
         window_poll_events();
 
+        // Clear screen
         context_clear(&context);
+
+        // Calculate scaled camera speed
+        float cam_move_speed_s = scale_speed(&timer, CAM_MOVE_SPEED);
+        float cam_rotate_speed_s = scale_speed(&timer, CAM_ROTATE_SPEED);
 
         // TODO: Create camera controller
         if (input_key_down(&input, IC_KEY_UP))
         {
-            camera_move_forward(&camera, 0.01f);
+            camera_move_forward(&camera, cam_move_speed_s);
         }
         else if (input_key_down(&input, IC_KEY_DOWN))
         {
-            camera_move_forward(&camera, -0.01f);
+            camera_move_forward(&camera, -cam_move_speed_s);
         }
         else if (input_key_down(&input, IC_KEY_LEFT))
         {
-            camera.yaw -= 0.1f;
+            camera.yaw -= cam_rotate_speed_s;
         }
         else if (input_key_down(&input, IC_KEY_RIGHT))
         {
-            camera.yaw += 0.1f;
+            camera.yaw += cam_rotate_speed_s;
         }
 
         // TODO: Create 'renderable' to automaticially retrieve data for shader uniforms
