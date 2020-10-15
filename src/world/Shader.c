@@ -8,14 +8,15 @@
 #include<assert.h>
 #include<string.h>
 
-typedef struct
+struct _Uniform_Location_Pair
 {
     const char *name;
-    GLint location;
-    
-} Uniform_Location_Pair;
+    GLint location;  
+};
 
-struct Shader_Data
+typedef struct _Uniform_Location_Pair Uniform_Location_Pair;
+
+struct _Shader_Data
 {
     GLuint program_id;
     GLuint v_shader_id;

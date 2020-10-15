@@ -8,6 +8,8 @@ struct _Camera
 {
     Vec3 position;
     float pitch, yaw;
+
+    float fov;
 };
 
 typedef struct _Camera Camera;

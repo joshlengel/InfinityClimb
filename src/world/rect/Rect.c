@@ -3,7 +3,7 @@
 #include<glad/glad.h>
 #include<stdlib.h>
 
-struct Rect_Data
+struct _Rect_Data
 {
     GLuint vao_id;
     GLuint v_buff_id;

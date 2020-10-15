@@ -4,9 +4,9 @@
 
 #include<stdint.h>
 
-typedef struct Shader_Data Shader_Data;
+typedef struct _Shader_Data Shader_Data;
 
-typedef struct
+struct _Shader
 {
     const char *vertex_source;
     const char *fragment_source;
@@ -14,7 +14,9 @@ typedef struct
     uint32_t num_uniforms;
 
     Shader_Data *data;
-} Shader;
+};
+
+typedef struct _Shader Shader;
 
 IC_ERROR_CODE shader_create(Shader *dest);
 void shader_destroy(const Shader *shader);

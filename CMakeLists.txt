@@ -18,10 +18,12 @@ set(sources
     "window/Input.c"
     "window/Context.c"
     "world/rect/Rect.c"
+    "world/rect/Rect_Shader.c"
     "world/player/Player.c"
     "world/Shader.c"
     "world/Camera.c"
     "world/Physics.c"
+    "world/Level.c"
 )
 
 list(TRANSFORM sources PREPEND "${IC_ROOT}/src/")
