@@ -46,4 +46,4 @@ void timer_destroy(const Timer *timer);
 
 void timer_start(Timer *timer);
 IC_BOOL timer_should_update(Timer *timer);
-float scale_speed(const Timer *timer, float speed);
+float timer_get_dt(const Timer *timer);

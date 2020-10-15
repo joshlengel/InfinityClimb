@@ -4,6 +4,7 @@
 #include"window/Input.h"
 #include"window/Context.h"
 #include"world/rect/Rect.h"
+#include"world/player/Player.h"
 #include"world/Shader.h"
 #include"world/Camera.h"
 #include"Libs.h"
@@ -25,10 +26,13 @@ Rect rect;
 Shader shader;
 
 Camera camera;
-Camera_Controller cam_controller;
+Player player;
+Player_Controller player_controller;
 
 Vec3 LIGHT_DIR = { -0.2f, -0.8f, 0.4f };
 Color SKY_COLOR;
+
+const uint16_t FOV = 70;
 
 int init()
 {
@@ -105,20 +109,21 @@ int init()
     // Initialize world aspects (Light, Camera, etc.)
     LIGHT_DIR = vec3_normalize(&LIGHT_DIR);
 
-    Vec3 cam_pos = { 0.0f, 0.0f, -2.0f };
-    camera.position = cam_pos;
+    player.position.x = 0.0f;
+    player.position.y = 2.0f;
+    player.position.z = 0.0f;
     
-    cam_controller.camera = &camera;
-    cam_controller.xz_speed = 0.7f;
-    cam_controller.y_speed = 0.9f;
-    cam_controller.mouse_sensitivity = 0.001f;
+    player_controller.player = &player;
+    player_controller.xz_speed = 0.7f;
+    player_controller.y_speed = 0.9f;
+    player_controller.mouse_sensitivity = 0.001f;
 
-    cam_controller.forward_key  = IC_KEY_W;
-    cam_controller.backward_key = IC_KEY_S;
-    cam_controller.right_key    = IC_KEY_D;
-    cam_controller.left_key     = IC_KEY_A;
-    cam_controller.up_key       = IC_KEY_SPACE;
-    cam_controller.down_key     = IC_KEY_SHIFT;
+    player_controller.forward_key  = IC_KEY_W;
+    player_controller.backward_key = IC_KEY_S;
+    player_controller.right_key    = IC_KEY_D;
+    player_controller.left_key     = IC_KEY_A;
+    player_controller.up_key       = IC_KEY_SPACE;
+    player_controller.down_key     = IC_KEY_SHIFT;
 
     return 0;
 }
@@ -163,19 +168,21 @@ int main(int argc, char **argv)
 
         if (!input_cursor_enabled(&input))
         {
-            // Camera movement
-            camera_controller_update(&cam_controller, &input, &timer);
+            // Player movement
+            player_controller_update(&player_controller, &input, timer_get_dt(&timer));
+
+            // First person camera
+            camera.position = player.position;
+            camera.pitch = player.pitch;
+            camera.yaw = player.yaw;
         }
 
         // TODO: Create 'renderable' to automaticially retrieve data for shader uniforms
-        Mat4 translate = mat4_make_translate(0.25f, -0.5f, 0.0f);
-        Mat4 scale = mat4_make_scale(0.5f, 0.4f, 1.0f);
-
         shader_bind(&shader);
         
         float mat_buffer[16];
         
-        Mat4 transform = mat4_mul(&translate, &scale);
+        Mat4 transform = rect_transform_matrix(&rect);
         mat4_load(&transform, mat_buffer);
         shader_set_uniform_mat4(&shader, "transform", mat_buffer);
 
@@ -183,7 +190,7 @@ int main(int argc, char **argv)
         mat4_load(&view, mat_buffer);
         shader_set_uniform_mat4(&shader, "view", mat_buffer);
 
-        Mat4 projection = mat4_make_project(M_PI_2, window_aspect_ratio(&window), 0.1f, 100.0f);
+        Mat4 projection = mat4_make_project((float)FOV / 180 * M_PI, window_aspect_ratio(&window), 0.1f, 100.0f);
         mat4_load(&projection, mat_buffer);
         shader_set_uniform_mat4(&shader, "projection", mat_buffer);
 

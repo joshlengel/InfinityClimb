@@ -221,7 +221,7 @@ IC_BOOL timer_should_update(Timer *timer)
     return IC_FALSE;
 }
 
-float scale_speed(const Timer *timer, float speed)
+float timer_get_dt(const Timer *timer)
 {
-    return speed * timer->_diff;
+    return timer->_diff;
 }

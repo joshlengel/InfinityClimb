@@ -99,3 +99,18 @@ void rect_render(const Rect *rect)
     glBindVertexArray(rect->data->vao_id);
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, NULL);
 }
+
+Mat4 rect_transform_matrix(const Rect *rect)
+{
+    Mat4 scale = mat4_make_scale(
+        rect->scale.x,
+        rect->scale.y,
+        rect->scale.z);
+    
+    Mat4 translate = mat4_make_translate(
+        rect->position.x,
+        rect->position.y,
+        rect->position.z);
+    
+    return mat4_mul(&translate, &scale);
+}
