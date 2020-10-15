@@ -81,5 +81,5 @@ float input_cursor_x(const Input *input);
 float input_cursor_y(const Input *input);
 float input_cursor_dx(const Input *input);
 float input_cursor_dy(const Input *input);
-void input_disable_cursor(const Input *input);
-void input_enable_cursor(const Input *input);
+void input_disable_cursor(Input *input);
+void input_enable_cursor(Input *input);

@@ -1,4 +1,6 @@
 #include"world/Camera.h"
+#include"window/Input.h"
+#include"Utils.h"
 
 #include<math.h>
 
@@ -48,4 +50,43 @@ Mat4 camera_view_matrix(const Camera *camera)
     
     Mat4 res = mat4_mul(&rot, &translate);
     return res;
+}
+
+void camera_controller_update(const Camera_Controller *controller, const Input *input, const Timer *timer)
+{
+    float s_xz_speed = scale_speed(timer, controller->xz_speed);
+    float s_y_speed = scale_speed(timer, controller->y_speed);
+
+    if (input_key_down(input, controller->forward_key))
+    {
+        camera_move_forward(controller->camera, s_xz_speed);
+    }
+
+    if (input_key_down(input, controller->backward_key))
+    {
+        camera_move_forward(controller->camera, -s_xz_speed);
+    }
+
+    if (input_key_down(input, controller->right_key))
+    {
+        camera_move_right(controller->camera, s_xz_speed);
+    }
+
+    if (input_key_down(input, controller->left_key))
+    {
+        camera_move_right(controller->camera, -s_xz_speed);
+    }
+
+    if (input_key_down(input, controller->up_key))
+    {
+        camera_move_up(controller->camera, s_y_speed);
+    }
+
+    if (input_key_down(input, controller->down_key))
+    {
+        camera_move_up(controller->camera, -s_y_speed);
+    }
+
+    controller->camera->yaw += input_cursor_dx(input) * controller->mouse_sensitivity;
+    controller->camera->pitch += input_cursor_dy(input) * controller->mouse_sensitivity;
 }

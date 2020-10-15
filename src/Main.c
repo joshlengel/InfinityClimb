@@ -23,13 +23,12 @@ Input input;
 
 Rect rect;
 Shader shader;
+
 Camera camera;
+Camera_Controller cam_controller;
 
 Vec3 LIGHT_DIR = { -0.2f, -0.8f, 0.4f };
 Color SKY_COLOR;
-
-const float CAM_MOVE_SPEED = 0.7f;
-const float MOUSE_SENSITIVITY = 0.001f;
 
 int init()
 {
@@ -108,6 +107,18 @@ int init()
 
     Vec3 cam_pos = { 0.0f, 0.0f, -2.0f };
     camera.position = cam_pos;
+    
+    cam_controller.camera = &camera;
+    cam_controller.xz_speed = 0.7f;
+    cam_controller.y_speed = 0.9f;
+    cam_controller.mouse_sensitivity = 0.001f;
+
+    cam_controller.forward_key  = IC_KEY_W;
+    cam_controller.backward_key = IC_KEY_S;
+    cam_controller.right_key    = IC_KEY_D;
+    cam_controller.left_key     = IC_KEY_A;
+    cam_controller.up_key       = IC_KEY_SPACE;
+    cam_controller.down_key     = IC_KEY_SHIFT;
 
     return 0;
 }
@@ -150,42 +161,8 @@ int main(int argc, char **argv)
             input_enable_cursor(&input);
         }
 
-        // Calculate scaled camera speed
-        float cam_move_speed_s = scale_speed(&timer, CAM_MOVE_SPEED);
-
-        // TODO: Create camera controller
-        if (input_key_down(&input, IC_KEY_UP))
-        {
-            camera_move_forward(&camera, cam_move_speed_s);
-        }
-        
-        if (input_key_down(&input, IC_KEY_DOWN))
-        {
-            camera_move_forward(&camera, -cam_move_speed_s);
-        }
-        
-        if (input_key_down(&input, IC_KEY_LEFT))
-        {
-            camera_move_right(&camera, -cam_move_speed_s);
-        }
-        
-        if (input_key_down(&input, IC_KEY_RIGHT))
-        {
-            camera_move_right(&camera, cam_move_speed_s);
-        }
-
-        if (input_key_down(&input, IC_KEY_SPACE))
-        {
-            camera_move_up(&camera, cam_move_speed_s);
-        }
-
-        if (input_key_down(&input, IC_KEY_SHIFT))
-        {
-            camera_move_up(&camera, -cam_move_speed_s);
-        }
-
-        camera.pitch += input_cursor_dy(&input) * MOUSE_SENSITIVITY;
-        camera.yaw += input_cursor_dx(&input) * MOUSE_SENSITIVITY;
+        // Camera movement
+        camera_controller_update(&cam_controller, &input, &timer);
 
         // TODO: Create 'renderable' to automaticially retrieve data for shader uniforms
         Mat4 translate = mat4_make_translate(0.25f, -0.5f, 0.0f);
