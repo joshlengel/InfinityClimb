@@ -3,7 +3,7 @@
 #include"window/Window.h"
 #include"window/Input.h"
 #include"window/Context.h"
-#include"world/Rect.h"
+#include"world/rect/Rect.h"
 #include"world/Shader.h"
 #include"world/Camera.h"
 #include"Libs.h"
@@ -158,11 +158,14 @@ int main(int argc, char **argv)
         // Check to see if user pressed escape to bring cursor back
         if (input_key_pressed(&input, IC_KEY_ESCAPE))
         {
-            input_enable_cursor(&input);
+            input_toggle_cursor(&input);
         }
 
-        // Camera movement
-        camera_controller_update(&cam_controller, &input, &timer);
+        if (!input_cursor_enabled(&input))
+        {
+            // Camera movement
+            camera_controller_update(&cam_controller, &input, &timer);
+        }
 
         // TODO: Create 'renderable' to automaticially retrieve data for shader uniforms
         Mat4 translate = mat4_make_translate(0.25f, -0.5f, 0.0f);

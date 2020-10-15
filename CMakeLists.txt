@@ -17,7 +17,7 @@ set(sources
     "window/Window.c"
     "window/Input.c"
     "window/Context.c"
-    "world/Rect.c"
+    "world/rect/Rect.c"
     "world/Shader.c"
     "world/Camera.c"
 )

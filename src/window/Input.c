@@ -150,18 +150,25 @@ float input_cursor_dy(const Input *input)
     return input_cursor_y(input) - input->_cy_o;
 }
 
-void input_disable_cursor(Input *input)
+void input_disable_cursor(const Input *input)
 {
     glfwSetInputMode(input->window->data->handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    // This causes the cursor to jump so reset delta
-    input->_cx_n = input_cursor_x(input);
-    input->_cy_n = input_cursor_y(input);
 }
 
-void input_enable_cursor(Input *input)
+void input_enable_cursor(const Input *input)
 {
     glfwSetInputMode(input->window->data->handle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-    // This causes the cursor to jump so reset delta
-    input->_cx_n = input_cursor_x(input);
-    input->_cy_n = input_cursor_y(input);
+}
+
+IC_BOOL input_cursor_enabled(const Input *input)
+{
+    return glfwGetInputMode(input->window->data->handle, GLFW_CURSOR) == GLFW_CURSOR_NORMAL;
+}
+
+void input_toggle_cursor(const Input *input)
+{
+    if (input_cursor_enabled(input))
+        input_disable_cursor(input);
+    else
+        input_enable_cursor(input);
 }
