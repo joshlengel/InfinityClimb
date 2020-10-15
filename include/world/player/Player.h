@@ -1,7 +1,16 @@
 #pragma once
 
 #include"window/Input.h"
+#include"world/Physics.h"
 #include"math/Vec.h"
+
+enum _Player_Type
+{
+    IC_PLAYER_SUPER,
+    IC_PLAYER_NORMAL
+};
+
+typedef enum _Player_Type Player_Type;
 
 struct _Player
 {
@@ -12,12 +21,13 @@ struct _Player
     Vec3 accum_velocity;
     Vec3 accum_acceleration;
 
-    // AABB
-    Vec3 half_extents;
+    AABB aabb;
 
     float mass;
 
     float pitch, yaw;
+
+    Player_Type type;
 };
 
 typedef struct _Player Player;

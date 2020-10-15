@@ -21,6 +21,7 @@ set(sources
     "world/player/Player.c"
     "world/Shader.c"
     "world/Camera.c"
+    "world/Physics.c"
 )
 
 list(TRANSFORM sources PREPEND "${IC_ROOT}/src/")

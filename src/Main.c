@@ -7,6 +7,7 @@
 #include"world/player/Player.h"
 #include"world/Shader.h"
 #include"world/Camera.h"
+#include"world/Physics.h"
 #include"Libs.h"
 #include"Log.h"
 #include"Utils.h"
@@ -23,6 +24,7 @@ Context context;
 Input input;
 
 Rect rect;
+AABB rect_aabb;
 Shader shader;
 
 Camera camera;
@@ -77,6 +79,12 @@ int init()
 
     rect.position = rect_pos;
     rect.scale = rect_scale;
+    rect_aabb.center.x = 0.0f;
+    rect_aabb.center.y = 0.0f;
+    rect_aabb.center.z = 0.0f;
+    rect_aabb.extent.x = 1.0f;
+    rect_aabb.extent.y = 1.0f;
+    rect_aabb.extent.z = 1.0f;
 
     // Loader
     loader.num_resources = 6;
@@ -109,13 +117,19 @@ int init()
     // Initialize world aspects (Light, Camera, etc.)
     LIGHT_DIR = vec3_normalize(&LIGHT_DIR);
 
+    player.type = IC_PLAYER_NORMAL;
+
     player.position.x = 0.0f;
     player.position.y = 2.0f;
     player.position.z = 0.0f;
+
+    player.aabb.extent.x = 0.1f;
+    player.aabb.extent.y = 0.3f;
+    player.aabb.extent.z = 0.1f;
     
     player_controller.player = &player;
     player_controller.xz_speed = 0.7f;
-    player_controller.y_speed = 0.9f;
+    player_controller.y_speed = 3.0f;
     player_controller.mouse_sensitivity = 0.001f;
 
     player_controller.forward_key  = IC_KEY_W;
@@ -171,6 +185,13 @@ int main(int argc, char **argv)
             // Player movement
             player_controller_update(&player_controller, &input, timer_get_dt(&timer));
 
+            player.aabb.center = player.position;
+
+            Vec3 zero = { 0.0f, 0.0f, 0.0f };
+            Collision_Result result = physics_collide(&player.aabb, &player.velocity, &rect_aabb, &zero);
+            player.position = vec3_add(&player.position, &result.obj1_displacement);
+            player.velocity = result.obj1_vel;
+
             // First person camera
             camera.position = player.position;
             camera.pitch = player.pitch;
@@ -190,7 +211,7 @@ int main(int argc, char **argv)
         mat4_load(&view, mat_buffer);
         shader_set_uniform_mat4(&shader, "view", mat_buffer);
 
-        Mat4 projection = mat4_make_project((float)FOV / 180 * M_PI, window_aspect_ratio(&window), 0.1f, 100.0f);
+        Mat4 projection = mat4_make_project((float)FOV / 180 * M_PI, window_aspect_ratio(&window), 0.01f, 100.0f);
         mat4_load(&projection, mat_buffer);
         shader_set_uniform_mat4(&shader, "projection", mat_buffer);
 

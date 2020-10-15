@@ -37,6 +37,10 @@ Vec2 vec2_negate(const Vec2 *v);
 Vec3 vec3_negate(const Vec3 *v);
 Vec4 vec4_negate(const Vec4 *v);
 
+Vec2 vec2_abs(const Vec2 *v);
+Vec3 vec3_abs(const Vec3 *v);
+Vec4 vec4_abs(const Vec4 *v);
+
 float vec2_dot(const Vec2 *v1, const Vec2 *v2);
 float vec3_dot(const Vec3 *v1, const Vec3 *v2);
 float vec4_dot(const Vec4 *v1, const Vec4 *v2);

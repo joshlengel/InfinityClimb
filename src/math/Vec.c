@@ -62,6 +62,26 @@ Vec4 vec4_negate(const Vec4 *v)
     Vec4 res = { -v->x, -v->y, -v->z, -v->w }; return res;
 }
 
+float __abs_impl(float v)
+{
+    return v < 0.0f? -v : v;
+}
+
+Vec2 vec2_abs(const Vec2 *v)
+{
+    Vec2 res = { __abs_impl(v->x), __abs_impl(v->y) }; return res;
+}
+
+Vec3 vec3_abs(const Vec3 *v)
+{
+    Vec3 res = { __abs_impl(v->x), __abs_impl(v->y), __abs_impl(v->z) }; return res;
+}
+
+Vec4 vec4_abs(const Vec4 *v)
+{
+    Vec4 res = { __abs_impl(v->x), __abs_impl(v->y), __abs_impl(v->z), __abs_impl(v->w) }; return res;
+}
+
 float vec2_dot(const Vec2 *v1, const Vec2 *v2)
 {
     return v1->x * v2->x + v1->y * v2->y;
