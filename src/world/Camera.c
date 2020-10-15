@@ -44,7 +44,7 @@ Mat4 camera_view_matrix(const Camera *camera)
           0.0f, 0.0f,  0.0f, 1.0f
     };
 
-    Mat4 rot = mat4_mul(&rot_pitch, &rot_yaw);
+    Mat4 rot = mat4_mul(&rot_yaw, &rot_pitch);
     
     Mat4 res = mat4_mul(&rot, &translate);
     return res;

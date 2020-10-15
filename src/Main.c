@@ -29,7 +29,7 @@ Vec3 LIGHT_DIR = { -0.2f, -0.8f, 0.4f };
 Color SKY_COLOR;
 
 const float CAM_MOVE_SPEED = 0.7f;
-const float CAM_ROTATE_SPEED = 2.0f;
+const float MOUSE_SENSITIVITY = 0.001f;
 
 int init()
 {
@@ -127,6 +127,8 @@ int main(int argc, char **argv)
     {
         remove("../logs/init_log.txt");
     }
+
+    input_disable_cursor(&input);
     
     window_show(&window);
     timer_start(&timer);
@@ -142,27 +144,48 @@ int main(int argc, char **argv)
         // Clear screen
         context_clear(&context);
 
+        // Check to see if user pressed escape to bring cursor back
+        if (input_key_pressed(&input, IC_KEY_ESCAPE))
+        {
+            input_enable_cursor(&input);
+        }
+
         // Calculate scaled camera speed
         float cam_move_speed_s = scale_speed(&timer, CAM_MOVE_SPEED);
-        float cam_rotate_speed_s = scale_speed(&timer, CAM_ROTATE_SPEED);
 
         // TODO: Create camera controller
         if (input_key_down(&input, IC_KEY_UP))
         {
             camera_move_forward(&camera, cam_move_speed_s);
         }
-        else if (input_key_down(&input, IC_KEY_DOWN))
+        
+        if (input_key_down(&input, IC_KEY_DOWN))
         {
             camera_move_forward(&camera, -cam_move_speed_s);
         }
-        else if (input_key_down(&input, IC_KEY_LEFT))
+        
+        if (input_key_down(&input, IC_KEY_LEFT))
         {
-            camera.yaw -= cam_rotate_speed_s;
+            camera_move_right(&camera, -cam_move_speed_s);
         }
-        else if (input_key_down(&input, IC_KEY_RIGHT))
+        
+        if (input_key_down(&input, IC_KEY_RIGHT))
         {
-            camera.yaw += cam_rotate_speed_s;
+            camera_move_right(&camera, cam_move_speed_s);
         }
+
+        if (input_key_down(&input, IC_KEY_SPACE))
+        {
+            camera_move_up(&camera, cam_move_speed_s);
+        }
+
+        if (input_key_down(&input, IC_KEY_SHIFT))
+        {
+            camera_move_up(&camera, -cam_move_speed_s);
+        }
+
+        camera.pitch += input_cursor_dy(&input) * MOUSE_SENSITIVITY;
+        camera.yaw += input_cursor_dx(&input) * MOUSE_SENSITIVITY;
 
         // TODO: Create 'renderable' to automaticially retrieve data for shader uniforms
         Mat4 translate = mat4_make_translate(0.25f, -0.5f, 0.0f);

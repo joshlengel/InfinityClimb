@@ -50,7 +50,8 @@ const int IC_TO_GLFW_KEY[IC_KEY_LAST] =
     GLFW_KEY_LEFT,
     GLFW_KEY_RIGHT,
     GLFW_KEY_SPACE,
-    -1
+    -1, // Shift
+    GLFW_KEY_ESCAPE
 };
 
 const int IC_TO_GLFW_MOUSE_BUTTON[IC_MOUSE_BUTTON_LAST] =
@@ -77,6 +78,12 @@ void input_update(Input *input)
 {
     for (IC_KEY key = 0; key < IC_KEY_LAST; ++key) input->_keys[key] = input_key_down(input, key);
     for (IC_MOUSE_BUTTON mouse_button = 0; mouse_button < IC_MOUSE_BUTTON_LAST; ++mouse_button) input->_mouse_buttons[mouse_button] = input_mouse_button_down(input, mouse_button);
+
+    input->_cx_o = input->_cx_n;
+    input->_cy_o = input->_cy_n;
+
+    input->_cx_n = input_cursor_x(input);
+    input->_cy_n = input_cursor_y(input);
 }
 
 IC_BOOL input_key_down(const Input *input, IC_KEY key)
@@ -115,4 +122,38 @@ IC_BOOL input_mouse_button_pressed(const Input *input, IC_MOUSE_BUTTON mouse_but
 IC_BOOL input_mouse_button_released(const Input *input, IC_MOUSE_BUTTON mouse_button)
 {
     return !input_mouse_button_down(input, mouse_button) && input->_mouse_buttons[mouse_button];
+}
+
+float input_cursor_x(const Input *input)
+{
+    double x[1];
+    glfwGetCursorPos(input->window->data->handle, x, NULL);
+    return (float)x[0];
+}
+
+float input_cursor_y(const Input *input)
+{
+    double y[1];
+    glfwGetCursorPos(input->window->data->handle, NULL, y);
+    return (float)y[0];
+}
+
+float input_cursor_dx(const Input *input)
+{
+    return input_cursor_x(input) - input->_cx_o;
+}
+
+float input_cursor_dy(const Input *input)
+{
+    return input_cursor_y(input) - input->_cy_o;
+}
+
+void input_disable_cursor(const Input *input)
+{
+    glfwSetInputMode(input->window->data->handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+}
+
+void input_enable_cursor(const Input *input)
+{
+    glfwSetInputMode(input->window->data->handle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }
