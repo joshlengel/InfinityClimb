@@ -10,7 +10,7 @@ struct Rect_Data
     GLuint i_buff_id;
 };
 
-void rect_create(Rect *dest)
+IC_ERROR_CODE rect_create(Rect *dest)
 {
     Rect_Data *data = malloc(sizeof(Rect_Data));
     glGenVertexArrays(1, &data->vao_id);
@@ -81,6 +81,8 @@ void rect_create(Rect *dest)
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, data->i_buff_id);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    return IC_NO_ERROR;
 }
 
 void rect_destroy(const Rect *rect)

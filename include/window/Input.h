@@ -65,7 +65,8 @@ struct _Input
 
 typedef struct _Input Input;
 
-void input_create(Input *input);
+IC_ERROR_CODE input_create(Input *input);
+void input_destroy(const Input *input);
 void input_update(Input *input);
 IC_BOOL input_key_down(const Input *input, IC_KEY key);
 IC_BOOL input_key_pressed(const Input *input, IC_KEY key);

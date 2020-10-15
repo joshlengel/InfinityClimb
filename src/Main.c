@@ -14,8 +14,12 @@
 #include<stdlib.h>
 #include<math.h>
 
+Loader loader;
+    
 Window window;
+Context context;
 Input input;
+
 Rect rect;
 Shader shader;
 Camera camera;
@@ -28,84 +32,75 @@ int init()
 {
     IC_ERROR_CODE ec;
 
+    // Load libraries
     if ((ec = load_libs()) != IC_NO_ERROR)
     {
         log_trace("Error loading libs. Error code: %i", ec);
         return -1;
     }
 
+    // Window
     window.width = 800;
     window.height = 600;
     window.title = "Hello World!";
 
-    if ((ec = window_create(&window)) != IC_NO_ERROR)
-    {
-        log_trace("Error creating window. Error code: %i", ec);
-        return -1;
-    }
-
-    context_init();
-
     input.window = &window;
-    input_create(&input);
 
+    // Context
+    SKY_COLOR = color_create_hex(0x87CEEBFF);
+    
+    context.background_color = &SKY_COLOR;
+    context.clear_color = IC_TRUE;
+    context.clear_depth = IC_TRUE;
+
+    // Shader
+    shader.vertex_source = read_source("../assets/shaders/rect.vert", &ec);
+    if (ec != IC_NO_ERROR) return -1;
+
+    shader.fragment_source = read_source("../assets/shaders/rect.frag", &ec);
+    if (ec != IC_NO_ERROR) return -1;
+
+    shader.num_uniforms = 5;
+
+    // Rectangle
     Vec3 rect_pos = { 0.0f, 0.0f, 0.0f };
     Vec3 rect_scale = { 1.0f, 1.0f, 1.0f };
 
     rect.position = rect_pos;
     rect.scale = rect_scale;
 
-    rect_create(&rect);
+    // Loader
+    loader.num_resources = 5;
 
-    shader.vertex_source = read_source("../assets/shaders/rect.vert", &ec);
-    if (ec != IC_NO_ERROR)
-    {
-        if (ec == IC_READ_CLOSE_FILE_ERROR) free((void*)shader.vertex_source);
-        
-        rect_destroy(&rect);
-        window_destroy(&window);
-        return -1;
-    }
+    loader_create(&loader);
+    loader_add_resource(&loader, &window,  (Loader_Init_proc)window_create,  (Loader_Dest_proc)window_destroy);
+    loader_add_resource(&loader, &input,   (Loader_Init_proc)input_create,   (Loader_Dest_proc)input_destroy);
+    loader_add_resource(&loader, &context, (Loader_Init_proc)context_create, (Loader_Dest_proc)context_destroy);
+    loader_add_resource(&loader, &rect,    (Loader_Init_proc)rect_create,    (Loader_Dest_proc)rect_destroy);
+    loader_add_resource(&loader, &shader,  (Loader_Init_proc)shader_create,  (Loader_Dest_proc)shader_destroy);
+    loader_load(&loader);
 
-    shader.fragment_source = read_source("../assets/shaders/rect.frag", &ec);
-    if (ec != IC_NO_ERROR)
-    {
-        if (ec == IC_READ_CLOSE_FILE_ERROR) free((void*)shader.fragment_source);
-        
-        rect_destroy(&rect);
-        window_destroy(&window);
-        return -1;
-    }
-
-    shader.num_uniforms = 5;
-
-    if ((ec = shader_create(&shader)) != IC_NO_ERROR)
-    {
-        log_trace("Error creating shader. Error code: %i", ec);
-
-        free((void*)shader.vertex_source);
-        free((void*)shader.fragment_source);
-        rect_destroy(&rect);
-        window_destroy(&window);
-        return -1;
-    }
-
+    if (loader_error(&loader) != IC_NO_ERROR) return -1;
+    
+    // Delete allocated strings for shader source code
     free((void*)shader.vertex_source);
     free((void*)shader.fragment_source);
-    
+
+    // Update context
+    context_update(&context);
+
+    // Declare shader uniforms
     shader_declare_uniform(&shader, "transform");
     shader_declare_uniform(&shader, "view");
     shader_declare_uniform(&shader, "projection");
     shader_declare_uniform(&shader, "base_color");
     shader_declare_uniform(&shader, "light_dir");
 
+    // Initialize world aspects (Light, Camera, etc.)
     LIGHT_DIR = vec3_normalize(&LIGHT_DIR);
 
     Vec3 cam_pos = { 0.0f, 0.0f, -2.0f };
     camera.position = cam_pos;
-
-    SKY_COLOR = color_create_hex(0x87CEEBFF);
-    context_background_color(&SKY_COLOR);
 
     return 0;
 }
@@ -133,8 +128,9 @@ int main(int argc, char **argv)
         input_update(&input);
         window_poll_events();
 
-        context_clear();
+        context_clear(&context);
 
+        // TODO: Create camera controller
         if (input_key_down(&input, IC_KEY_UP))
         {
             camera_move_forward(&camera, 0.01f);
@@ -152,6 +148,7 @@ int main(int argc, char **argv)
             camera.yaw += 0.1f;
         }
 
+        // TODO: Create 'renderable' to automaticially retrieve data for shader uniforms
         Mat4 translate = mat4_make_translate(0.25f, -0.5f, 0.0f);
         Mat4 scale = mat4_make_scale(0.5f, 0.4f, 1.0f);
 
@@ -178,9 +175,8 @@ int main(int argc, char **argv)
         window_swap_buffers(&window);
     }
 
-    rect_destroy(&rect);
-    shader_destroy(&shader);
-    window_destroy(&window);
+    loader_unload(&loader);
+    loader_destroy(&loader);
 
     terminate_libs();
 

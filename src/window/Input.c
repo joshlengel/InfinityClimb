@@ -60,10 +60,17 @@ const int IC_TO_GLFW_MOUSE_BUTTON[IC_MOUSE_BUTTON_LAST] =
     GLFW_MOUSE_BUTTON_MIDDLE
 };
 
-void input_create(Input *input)
+IC_ERROR_CODE input_create(Input *input)
 {
     memset(input->keys, 0, sizeof(input->keys));
     memset(input->mouse_buttons, 0, sizeof(input->mouse_buttons));
+
+    return IC_NO_ERROR;
+}
+
+void input_destroy(const Input *input)
+{
+    
 }
 
 void input_update(Input *input)
