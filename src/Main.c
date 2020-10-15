@@ -1,4 +1,5 @@
 #include"math/Mat.h"
+#include"math/Color.h"
 #include"window/Window.h"
 #include"window/Input.h"
 #include"window/Context.h"
@@ -20,6 +21,8 @@ Shader shader;
 Camera camera;
 
 Vec3 LIGHT_DIR = { -0.2f, -0.8f, 0.4f };
+
+Color SKY_COLOR;
 
 int init()
 {
@@ -101,7 +104,8 @@ int init()
     Vec3 cam_pos = { 0.0f, 0.0f, -2.0f };
     camera.position = cam_pos;
 
-    context_background_color(1.0f, 0.0f, 0.0f, 1.0f);
+    SKY_COLOR = color_create_hex(0x87CEEBFF);
+    context_background_color(&SKY_COLOR);
 
     return 0;
 }
@@ -167,7 +171,7 @@ int main(int argc, char **argv)
         mat4_load(&projection, mat_buffer);
         shader_set_uniform_mat4(&shader, "projection", mat_buffer);
 
-        shader_set_uniform_4f(&shader, "base_color", 0.5f, 0.7f, 0.9f, 1.0f);
+        shader_set_uniform_4f(&shader, "base_color", 0.4f, 0.4f, 0.4f, 1.0f);
         shader_set_uniform_3f(&shader, "light_dir", LIGHT_DIR.x, LIGHT_DIR.y, LIGHT_DIR.z);
         rect_render(&rect);
 

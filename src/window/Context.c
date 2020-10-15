@@ -1,3 +1,5 @@
+#include"math/Color.h"
+
 #include<glad/glad.h>
 
 void context_init()
@@ -10,9 +12,9 @@ void context_terminate()
 
 }
 
-void context_background_color(float r, float g, float b, float a)
+void context_background_color(const Color *color)
 {
-    glClearColor(r, g, b, a);
+    glClearColor(color->red_f, color->green_f, color->blue_f, color->alpha_f);
 }
 
 void context_clear()

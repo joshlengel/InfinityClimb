@@ -13,6 +13,7 @@ set(sources
     "Utils.c"
     "math/Vec.c"
     "math/Mat.c"
+    "math/Color.c"
     "window/Window.c"
     "window/Input.c"
     "window/Context.c"

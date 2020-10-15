@@ -7,6 +7,11 @@
 
 #include<stdlib.h>
 
+void window_resize_callback(GLFWwindow *window, int width, int height)
+{
+    glViewport(0, 0, width, height);
+}
+
 IC_ERROR_CODE window_create(Window *dest)
 {
     Window_Data *data = malloc(sizeof(Window_Data));
@@ -31,6 +36,8 @@ IC_ERROR_CODE window_create(Window *dest)
         window_destroy(dest);
         return IC_WINDOW_GL_CONTEXT_ERROR;
     }
+
+    glfwSetWindowSizeCallback(data->handle, window_resize_callback);
 
     return IC_NO_ERROR;
 }

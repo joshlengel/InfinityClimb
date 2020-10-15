@@ -115,8 +115,18 @@ Mat4 mat4_make_project(float fov, float aspect_ratio, float clip_near, float cli
     float tan_half_fov = tanf(fov * 0.5f);
 
     Mat4 res = mat4_identity();
-    res.m00 = 1.0f / (tan_half_fov * aspect_ratio);
-    res.m11 = 1.0f / tan_half_fov;
+
+    if (aspect_ratio > 1.0f)
+    {
+        res.m00 = 1.0f / tan_half_fov;
+        res.m11 = aspect_ratio / tan_half_fov;
+    }
+    else
+    {
+        res.m00 = 1.0f / (tan_half_fov * aspect_ratio);
+        res.m11 = 1.0f / tan_half_fov;
+    }
+    
     res.m22 = (clip_far + clip_near) / (clip_far - clip_near);
     res.m32 = -2.0f * clip_far * clip_near / (clip_far - clip_near);
     res.m23 = 1.0f;
