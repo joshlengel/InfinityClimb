@@ -20,6 +20,8 @@ set(sources
     "world/rect/Rect.c"
     "world/rect/Rect_Shader.c"
     "world/player/Player.c"
+    "world/skybox/Skybox.c"
+    "world/skybox/Skybox_Shader.c"
     "world/Shader.c"
     "world/Camera.c"
     "world/Physics.c"
@@ -38,6 +40,8 @@ include_directories("${IC_DEPS}/glfw/include")
 
 add_subdirectory("${IC_DEPS}/glad")
 include_directories("${IC_DEPS}/glad/include")
+
+include_directories("${IC_DEPS}/stb")
 
 # Build
 set(EXECUTABLE_OUTPUT_PATH "${IC_ROOT}/bin")

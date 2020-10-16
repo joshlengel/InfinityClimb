@@ -16,8 +16,8 @@ IC_ERROR_CODE context_create(Context *dest)
     dest->data = data;
 
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
+
+    context_update(dest);
 
     return IC_NO_ERROR;
 }
@@ -39,6 +39,16 @@ void context_update(const Context *context)
         context->background_color->green_f,
         context->background_color->blue_f,
         context->background_color->alpha_f);
+    
+    if (context->cull)
+    {
+        glEnable(GL_CULL_FACE);
+
+        if (context->cull_front)
+            glCullFace(GL_FRONT);
+        else
+            glCullFace(GL_BACK);
+    }
 }
 
 void context_clear(const Context *context)

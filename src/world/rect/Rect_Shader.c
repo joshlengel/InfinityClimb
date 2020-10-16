@@ -5,32 +5,32 @@
 
 #include<stdlib.h>
 
-IC_ERROR_CODE rect_shader_create(Rect_Shader *shader)
+IC_ERROR_CODE rect_shader_create(Rect_Shader *dest)
 {
     IC_ERROR_CODE ec;
 
-    shader->shader.vertex_source = read_source("../assets/shaders/rect.vert", &ec);
+    dest->shader.vertex_source = read_source("../assets/shaders/rect.vert", &ec);
     if (ec != IC_NO_ERROR) return ec;
 
-    shader->shader.fragment_source = read_source("../assets/shaders/rect.frag", &ec);
+    dest->shader.fragment_source = read_source("../assets/shaders/rect.frag", &ec);
     if (ec != IC_NO_ERROR) return ec;
 
-    shader->shader.num_uniforms = 5;
+    dest->shader.num_uniforms = 5;
 
-    ec = shader_create(&shader->shader);
+    ec = shader_create(&dest->shader);
 
     if (ec != IC_NO_ERROR) return ec;
 
     // Delete allocated strings for shader source code
-    free((void*)shader->shader.vertex_source);
-    free((void*)shader->shader.fragment_source);
+    free((void*)dest->shader.vertex_source);
+    free((void*)dest->shader.fragment_source);
 
     // Declare shader uniforms
-    shader_declare_uniform(&shader->shader, "transform");
-    shader_declare_uniform(&shader->shader, "view");
-    shader_declare_uniform(&shader->shader, "projection");
-    shader_declare_uniform(&shader->shader, "base_color");
-    shader_declare_uniform(&shader->shader, "light_dir");
+    shader_declare_uniform(&dest->shader, "transform");
+    shader_declare_uniform(&dest->shader, "view");
+    shader_declare_uniform(&dest->shader, "projection");
+    shader_declare_uniform(&dest->shader, "base_color");
+    shader_declare_uniform(&dest->shader, "light_dir");
 
     return IC_NO_ERROR;
 }

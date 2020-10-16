@@ -5,6 +5,8 @@
 #include"window/Context.h"
 #include"world/rect/Rect.h"
 #include"world/rect/Rect_Shader.h"
+#include"world/skybox/Skybox.h"
+#include"world/skybox/Skybox_Shader.h"
 #include"world/player/Player.h"
 #include"world/Camera.h"
 #include"world/Physics.h"
@@ -26,13 +28,15 @@ Input input;
 
 Rect rect_floor;
 Rect rect1;
-Rect_Shader shader;
+Rect_Shader rect_shader;
 
 Camera camera;
 Player player;
 Player_Controller player_controller;
 
 Level level;
+Skybox skybox;
+Skybox_Shader skybox_shader;
 
 Vec3 LIGHT_DIR = { 0.5f, -0.8f, -0.4f };
 Color SKY_COLOR;
@@ -64,6 +68,8 @@ int init()
     context.background_color = &SKY_COLOR;
     context.clear_color = IC_TRUE;
     context.clear_depth = IC_TRUE;
+    context.cull = IC_TRUE;
+    context.cull_front = IC_FALSE;
 
     // Rectangles
     rect_floor.aabb.center.x =  0.0f;
@@ -83,7 +89,7 @@ int init()
     // Level
     level.window = &window;
     level.camera = &camera;
-    level.rect_shader = &shader;
+    level.rect_shader = &rect_shader;
     level.player = &player;
     level.start_position.x = 0.0f;
     level.start_position.y = 2.0f;
@@ -95,18 +101,29 @@ int init()
 
     level.num_rects = 2;
 
+    // Skybox
+    skybox.left_tex_path   = "../assets/textures/left.png";
+    skybox.right_tex_path  = "../assets/textures/right.png";
+    skybox.bottom_tex_path = "../assets/textures/bottom.png";
+    skybox.top_tex_path    = "../assets/textures/top.png";
+    skybox.front_tex_path  = "../assets/textures/front.png";
+    skybox.back_tex_path   = "../assets/textures/back.png";
+    skybox.size = 100.0f;
+
     // Loader
-    loader.num_resources = 8;
+    loader.num_resources = 10;
 
     loader_create(&loader);
-    loader_add_resource(&loader, &timer,      (Loader_Init_proc)timer_create,       (Loader_Dest_proc)timer_destroy);
-    loader_add_resource(&loader, &window,     (Loader_Init_proc)window_create,      (Loader_Dest_proc)window_destroy);
-    loader_add_resource(&loader, &input,      (Loader_Init_proc)input_create,       (Loader_Dest_proc)input_destroy);
-    loader_add_resource(&loader, &context,    (Loader_Init_proc)context_create,     (Loader_Dest_proc)context_destroy);
-    loader_add_resource(&loader, &rect_floor, (Loader_Init_proc)rect_create,        (Loader_Dest_proc)rect_destroy);
-    loader_add_resource(&loader, &rect1,      (Loader_Init_proc)rect_create,        (Loader_Dest_proc)rect_destroy);
-    loader_add_resource(&loader, &shader,     (Loader_Init_proc)rect_shader_create, (Loader_Dest_proc)rect_shader_destroy);
-    loader_add_resource(&loader, &level,      (Loader_Init_proc)level_create,       (Loader_Dest_proc)level_destroy);
+    loader_add_resource(&loader, &timer,         (Loader_Init_proc)timer_create,         (Loader_Dest_proc)timer_destroy);
+    loader_add_resource(&loader, &window,        (Loader_Init_proc)window_create,        (Loader_Dest_proc)window_destroy);
+    loader_add_resource(&loader, &input,         (Loader_Init_proc)input_create,         (Loader_Dest_proc)input_destroy);
+    loader_add_resource(&loader, &context,       (Loader_Init_proc)context_create,       (Loader_Dest_proc)context_destroy);
+    loader_add_resource(&loader, &rect_floor,    (Loader_Init_proc)rect_create,          (Loader_Dest_proc)rect_destroy);
+    loader_add_resource(&loader, &rect1,         (Loader_Init_proc)rect_create,          (Loader_Dest_proc)rect_destroy);
+    loader_add_resource(&loader, &rect_shader,   (Loader_Init_proc)rect_shader_create,   (Loader_Dest_proc)rect_shader_destroy);
+    loader_add_resource(&loader, &level,         (Loader_Init_proc)level_create,         (Loader_Dest_proc)level_destroy);
+    loader_add_resource(&loader, &skybox,        (Loader_Init_proc)skybox_create,        (Loader_Dest_proc)skybox_destroy);
+    loader_add_resource(&loader, &skybox_shader, (Loader_Init_proc)skybox_shader_create, (Loader_Dest_proc)skybox_shader_destroy);
     loader_load(&loader);
 
     if (loader_error(&loader) != IC_NO_ERROR) return -1;
@@ -120,7 +137,7 @@ int init()
 
     camera.fov = (float)70 / (float)180 * M_PI;
 
-    player.type = IC_PLAYER_NORMAL;
+    player.type = IC_PLAYER_SUPER;
 
     player.aabb.extent.x = 0.1f;
     player.aabb.extent.y = 0.3f;
@@ -188,6 +205,20 @@ int main(int argc, char **argv)
 
             level_update(&level, dt);
         }
+
+        context.cull_front = IC_TRUE;
+        context_update(&context);
+
+        Mat4 view = camera_view_matrix(&camera);
+        Mat4 projection = mat4_make_project(camera.fov, window_aspect_ratio(&window), 0.01f, 1000.0f);
+
+        skybox_shader_bind(&skybox_shader);
+        skybox_shader_set_view_projection(&skybox_shader, &view, &projection);
+        skybox_shader_set_skybox(&skybox_shader, &skybox);
+        skybox_render(&skybox);
+
+        context.cull_front = IC_FALSE;
+        context_update(&context);
 
         level_render(&level);
 

@@ -11,6 +11,8 @@ struct _Context
     IC_BOOL clear_color, clear_depth;
     const Color *background_color;
 
+    IC_BOOL cull, cull_front;
+
     Context_Data *data;
 };
 
