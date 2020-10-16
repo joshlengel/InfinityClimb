@@ -13,12 +13,11 @@ typedef struct _AABB AABB;
 struct _Collision_Result
 {
     Vec3 obj1_displacement;
-    Vec3 obj2_displacement;
+    Vec3 obj1_vel, obj1_accum_vel;
 
-    Vec3 obj1_vel;
-    Vec3 obj2_vel;
+    double time_simulated;
 };
 
 typedef struct _Collision_Result Collision_Result;
 
-Collision_Result physics_collide(const AABB *obj1, const Vec3 *vel1, const AABB *obj2, const Vec3 *vel2);
+Collision_Result physics_collide(const AABB *obj1, const Vec3 *vel1, const Vec3 *accum_vel1, const AABB *obj2, float dt);

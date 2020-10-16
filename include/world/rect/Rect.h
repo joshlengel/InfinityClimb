@@ -3,13 +3,13 @@
 #include"Core.h"
 #include"math/Vec.h"
 #include"math/Mat.h"
+#include"world/Physics.h"
 
 typedef struct _Rect_Data Rect_Data;
 
 struct _Rect
 {
-    Vec3 position;
-    Vec3 scale;
+    AABB aabb;
 
     const Rect_Data *data;
 };

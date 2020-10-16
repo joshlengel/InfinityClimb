@@ -11,7 +11,7 @@ uniform vec4 base_color;
 uniform vec3 light_dir;
 
 void main() {
-    float light_factor = max(dot(pass_normal, -light_dir), 0.1);
+    float light_factor = max(dot(pass_normal, -light_dir), 0.2);
 
     color = base_color * light_factor;
 }

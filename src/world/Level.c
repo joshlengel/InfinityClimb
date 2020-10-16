@@ -1,6 +1,7 @@
 #include"world/Level.h"
 
 #include"world/Camera.h"
+#include"world/Physics.h"
 #include"world/rect/Rect.h"
 #include"world/rect/Rect_Shader.h"
 #include"world/player/Player.h"
@@ -47,6 +48,45 @@ void level_add_rect(const Level *level, const Rect *rect)
     assert(level->data->rect_index < level->data->num_rects);
 
     *(level->data->rects + level->data->rect_index++) = rect;
+}
+
+void level_update(const Level *level, float dt)
+{
+    level->player->aabb.center = level->player->position;
+
+    float time_left = dt;
+    while (time_left > 0)
+    {
+        Vec3 sum_vel = vec3_add(&level->player->velocity, &level->player->accum_velocity);
+
+        Collision_Result min_result;
+        min_result.time_simulated = time_left;
+        min_result.obj1_displacement = vec3_scale(&sum_vel, time_left);
+        min_result.obj1_vel = level->player->velocity;
+        min_result.obj1_accum_vel = level->player->accum_velocity;
+
+        const Rect **itr = level->data->rects;
+        for (uint32_t i = 0; i < level->data->num_rects; ++i)
+        {
+            const Rect *rect = *(itr++);
+
+            Collision_Result result = physics_collide(&level->player->aabb, &level->player->velocity, &level->player->accum_velocity, &rect->aabb, time_left);
+            if (result.time_simulated < min_result.time_simulated)
+            {
+                min_result = result;
+            }
+        }
+
+        level->player->position = vec3_add(&level->player->position, &min_result.obj1_displacement);
+        level->player->velocity = min_result.obj1_vel;
+        level->player->accum_velocity = min_result.obj1_accum_vel;
+        time_left -= min_result.time_simulated;
+    }
+
+    // First person camera
+    level->camera->position = level->player->position;
+    level->camera->pitch = level->player->pitch;
+    level->camera->yaw = level->player->yaw;
 }
 
 void level_render(const Level *level)

@@ -24,8 +24,8 @@ Window window;
 Context context;
 Input input;
 
-Rect rect;
-AABB rect_aabb;
+Rect rect_floor;
+Rect rect1;
 Rect_Shader shader;
 
 Camera camera;
@@ -34,7 +34,7 @@ Player_Controller player_controller;
 
 Level level;
 
-Vec3 LIGHT_DIR = { -0.2f, -0.8f, 0.4f };
+Vec3 LIGHT_DIR = { 0.5f, -0.8f, -0.4f };
 Color SKY_COLOR;
 
 int init()
@@ -65,18 +65,20 @@ int init()
     context.clear_color = IC_TRUE;
     context.clear_depth = IC_TRUE;
 
-    // Rectangle
-    Vec3 rect_pos = { 0.0f, 0.0f, 0.0f };
-    Vec3 rect_scale = { 1.0f, 1.0f, 1.0f };
+    // Rectangles
+    rect_floor.aabb.center.x =  0.0f;
+    rect_floor.aabb.center.y = -0.2f;
+    rect_floor.aabb.center.z =  0.0f;
+    rect_floor.aabb.extent.x =  1.0f;
+    rect_floor.aabb.extent.y =  0.2f;
+    rect_floor.aabb.extent.z =  1.0f;
 
-    rect.position = rect_pos;
-    rect.scale = rect_scale;
-    rect_aabb.center.x = 0.0f;
-    rect_aabb.center.y = 0.0f;
-    rect_aabb.center.z = 0.0f;
-    rect_aabb.extent.x = 1.0f;
-    rect_aabb.extent.y = 1.0f;
-    rect_aabb.extent.z = 1.0f;
+    rect1.aabb.center.x =  0.5f;
+    rect1.aabb.center.y =  0.2f;
+    rect1.aabb.center.z = -0.25f;
+    rect1.aabb.extent.x =  0.3f;
+    rect1.aabb.extent.y =  0.2f;
+    rect1.aabb.extent.z =  0.5f;
 
     // Level
     level.window = &window;
@@ -91,19 +93,20 @@ int init()
 
     level.light_dir = vec3_normalize(&LIGHT_DIR);
 
-    level.num_rects = 1;
+    level.num_rects = 2;
 
     // Loader
-    loader.num_resources = 7;
+    loader.num_resources = 8;
 
     loader_create(&loader);
-    loader_add_resource(&loader, &timer,   (Loader_Init_proc)timer_create,       (Loader_Dest_proc)timer_destroy);
-    loader_add_resource(&loader, &window,  (Loader_Init_proc)window_create,      (Loader_Dest_proc)window_destroy);
-    loader_add_resource(&loader, &input,   (Loader_Init_proc)input_create,       (Loader_Dest_proc)input_destroy);
-    loader_add_resource(&loader, &context, (Loader_Init_proc)context_create,     (Loader_Dest_proc)context_destroy);
-    loader_add_resource(&loader, &rect,    (Loader_Init_proc)rect_create,        (Loader_Dest_proc)rect_destroy);
-    loader_add_resource(&loader, &shader,  (Loader_Init_proc)rect_shader_create, (Loader_Dest_proc)rect_shader_destroy);
-    loader_add_resource(&loader, &level,   (Loader_Init_proc)level_create,       (Loader_Dest_proc)level_destroy);
+    loader_add_resource(&loader, &timer,      (Loader_Init_proc)timer_create,       (Loader_Dest_proc)timer_destroy);
+    loader_add_resource(&loader, &window,     (Loader_Init_proc)window_create,      (Loader_Dest_proc)window_destroy);
+    loader_add_resource(&loader, &input,      (Loader_Init_proc)input_create,       (Loader_Dest_proc)input_destroy);
+    loader_add_resource(&loader, &context,    (Loader_Init_proc)context_create,     (Loader_Dest_proc)context_destroy);
+    loader_add_resource(&loader, &rect_floor, (Loader_Init_proc)rect_create,        (Loader_Dest_proc)rect_destroy);
+    loader_add_resource(&loader, &rect1,      (Loader_Init_proc)rect_create,        (Loader_Dest_proc)rect_destroy);
+    loader_add_resource(&loader, &shader,     (Loader_Init_proc)rect_shader_create, (Loader_Dest_proc)rect_shader_destroy);
+    loader_add_resource(&loader, &level,      (Loader_Init_proc)level_create,       (Loader_Dest_proc)level_destroy);
     loader_load(&loader);
 
     if (loader_error(&loader) != IC_NO_ERROR) return -1;
@@ -112,7 +115,8 @@ int init()
     context_update(&context);
 
     // Initialize world aspects (Light, Camera, etc.)
-    level_add_rect(&level, &rect);
+    level_add_rect(&level, &rect_floor);
+    level_add_rect(&level, &rect1);
 
     camera.fov = (float)70 / (float)180 * M_PI;
 
@@ -177,20 +181,12 @@ int main(int argc, char **argv)
 
         if (!input_cursor_enabled(&input))
         {
+            float dt = timer_get_dt(&timer);
+
             // Player movement
-            player_controller_update(&player_controller, &input, timer_get_dt(&timer));
+            player_controller_update(&player_controller, &input, dt);
 
-            player.aabb.center = player.position;
-
-            Vec3 zero = { 0.0f, 0.0f, 0.0f };
-            Collision_Result result = physics_collide(&player.aabb, &player.velocity, &rect_aabb, &zero);
-            player.position = vec3_add(&player.position, &result.obj1_displacement);
-            player.velocity = result.obj1_vel;
-
-            // First person camera
-            camera.position = player.position;
-            camera.pitch = player.pitch;
-            camera.yaw = player.yaw;
+            level_update(&level, dt);
         }
 
         level_render(&level);

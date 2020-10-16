@@ -103,14 +103,14 @@ void rect_render(const Rect *rect)
 Mat4 rect_transform_matrix(const Rect *rect)
 {
     Mat4 scale = mat4_make_scale(
-        rect->scale.x,
-        rect->scale.y,
-        rect->scale.z);
+        rect->aabb.extent.x,
+        rect->aabb.extent.y,
+        rect->aabb.extent.z);
     
     Mat4 translate = mat4_make_translate(
-        rect->position.x,
-        rect->position.y,
-        rect->position.z);
+        rect->aabb.center.x,
+        rect->aabb.center.y,
+        rect->aabb.center.z);
     
     return mat4_mul(&translate, &scale);
 }
