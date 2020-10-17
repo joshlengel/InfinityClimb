@@ -36,7 +36,7 @@ Level level;
 Skybox skybox;
 Skybox_Shader skybox_shader;
 
-Vec3 LIGHT_DIR = { 0.5f, -0.8f, -0.4f };
+Vec3 LIGHT_POSITION = { -30.0f, 40.0f, 20.0f };
 Color SKY_COLOR;
 
 int init()
@@ -75,7 +75,7 @@ int init()
     level.rect_shader = &rect_shader;
     level.player = &player;
 
-    level.light_dir = vec3_normalize(&LIGHT_DIR);
+    level.light_position = LIGHT_POSITION;
 
     level_create_from_file("../assets/levels/example.lvl", &level);
 

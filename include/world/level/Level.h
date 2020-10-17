@@ -24,7 +24,7 @@ struct _Level
     Camera *camera;
     Player *player;
 
-    Vec3 light_dir;
+    Vec3 light_position;
     
     Level_Data *data;
 };

@@ -21,4 +21,5 @@ void rect_shader_bind(const Rect_Shader *shader);
 void rect_shader_set_view_projection(const Rect_Shader *shader, const Mat4 *view, const Mat4 *projection);
 void rect_shader_set_rect(const Rect_Shader *shader, const Rect *rect);
 void rect_shader_set_color(const Rect_Shader *shader, const Color *color);
-void rect_shader_set_light(const Rect_Shader *shader, const Vec3 *direction);
+void rect_shader_set_light(const Rect_Shader *shader, const Vec3 *position);
+void rect_shader_set_camera_pos(const Rect_Shader *shader, const Vec3 *position);

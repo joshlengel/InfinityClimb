@@ -133,10 +133,11 @@ void level_render(const Level *level)
     Mat4 projection = mat4_make_project(level->camera->fov, window_aspect_ratio(level->window), 0.01f, 100.0f);
 
     rect_shader_set_view_projection(level->rect_shader, &view, &projection);
+    rect_shader_set_camera_pos(level->rect_shader, &level->camera->position);
 
-    Color rect_color = color_create_hex(0x666666FF);
+    Color rect_color = color_create_hex(0x888888FF);
     rect_shader_set_color(level->rect_shader, &rect_color);
-    rect_shader_set_light(level->rect_shader, &level->light_dir);
+    rect_shader_set_light(level->rect_shader, &level->light_position);
     
     Rect *itr = level->data->rects;
     for (uint32_t i = 0; i < level->data->num_rects; ++i)

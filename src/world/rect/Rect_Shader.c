@@ -22,7 +22,7 @@ IC_ERROR_CODE rect_shader_create(Rect_Shader *dest)
     string_view_create_s(&dest->shader.vertex_source, &v_src, 0, UINT32_MAX);
     string_view_create_s(&dest->shader.fragment_source, &f_src, 0, UINT32_MAX);
 
-    dest->shader.num_uniforms = 5;
+    dest->shader.num_uniforms = 6;
 
     ec = shader_create(&dest->shader);
 
@@ -37,7 +37,8 @@ IC_ERROR_CODE rect_shader_create(Rect_Shader *dest)
     shader_declare_uniform(&dest->shader, "view");
     shader_declare_uniform(&dest->shader, "projection");
     shader_declare_uniform(&dest->shader, "base_color");
-    shader_declare_uniform(&dest->shader, "light_dir");
+    shader_declare_uniform(&dest->shader, "light_position");
+    shader_declare_uniform(&dest->shader, "camera_position");
 
     return IC_NO_ERROR;
 }
@@ -77,7 +78,12 @@ void rect_shader_set_color(const Rect_Shader *shader, const Color *color)
     shader_set_uniform_4f(&shader->shader, "base_color", color->red_f, color->green_f, color->blue_f, color->alpha_f);
 }
 
-void rect_shader_set_light(const Rect_Shader *shader, const Vec3 *direction)
+void rect_shader_set_light(const Rect_Shader *shader, const Vec3 *light_pos)
 {
-    shader_set_uniform_3f(&shader->shader, "light_dir", direction->x, direction->y, direction->z);
+    shader_set_uniform_3f(&shader->shader, "light_position", light_pos->x, light_pos->y, light_pos->z);
+}
+
+void rect_shader_set_camera_pos(const Rect_Shader *shader, const Vec3 *camera_pos)
+{
+    shader_set_uniform_3f(&shader->shader, "camera_position", camera_pos->x, camera_pos->y, camera_pos->z);
 }
