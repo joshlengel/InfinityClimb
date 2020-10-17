@@ -1,5 +1,6 @@
-#include"math/Mat.h"
-#include"math/Color.h"
+#include"util/Utils.h"
+#include"util/Color.h"
+#include"util/math/Mat.h"
 #include"window/Window.h"
 #include"window/Input.h"
 #include"window/Context.h"
@@ -14,11 +15,9 @@
 #include"world/level/Level_Parser.h"
 #include"Libs.h"
 #include"Log.h"
-#include"Utils.h"
 
 #include<stdio.h>
 #include<stdlib.h>
-#include<math.h>
 
 Loader loader;
 Timer timer;
@@ -111,7 +110,7 @@ int init()
     // Initialize world aspects (Light, Camera, etc.)
     level_load(&level);
 
-    camera.fov = (float)70 / (float)180 * M_PI;
+    camera.fov = (float)70 / (float)180 * IC_PI;
 
     player.type = IC_PLAYER_NORMAL;
 

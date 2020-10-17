@@ -40,11 +40,14 @@ IC_ERROR_CODE shader_create(Shader *dest)
     data->uniform_index = 0;
     data->num_uniforms = dest->num_uniforms; // In case user changes this number
 
-    const char *const *v_src_ptr = &dest->vertex_source;
-    const char *const *f_src_ptr = &dest->fragment_source;
+    GLint v_src_length = (GLint)dest->vertex_source.length;
+    GLint f_src_length = (GLint)dest->fragment_source.length; 
 
-    glShaderSource(data->v_shader_id, 1, v_src_ptr, NULL);
-    glShaderSource(data->f_shader_id, 1, f_src_ptr, NULL);
+    const char *v_src = dest->vertex_source.c_str;
+    const char *f_src = dest->fragment_source.c_str;
+
+    glShaderSource(data->v_shader_id, 1, &v_src, &v_src_length);
+    glShaderSource(data->f_shader_id, 1, &f_src, &f_src_length);
 
     glCompileShader(data->v_shader_id);
     glCompileShader(data->f_shader_id);
@@ -133,7 +136,7 @@ void shader_declare_uniform(const Shader *shader, const char *name)
 }
 
 // Utility function
-GLint get_uniform_location(const Shader *shader, const char *name)
+GLint __get_uniform_location_impl(const Shader *shader, const char *name)
 {
     Uniform_Location_Pair *pair = shader->data->uniform_locations;
 
@@ -152,52 +155,52 @@ GLint get_uniform_location(const Shader *shader, const char *name)
 
 void shader_set_uniform_1i(const Shader *shader, const char *name, int32_t v)
 {
-    glUniform1i(get_uniform_location(shader, name), v);
+    glUniform1i(__get_uniform_location_impl(shader, name), v);
 }
 
 void shader_set_uniform_2i(const Shader *shader, const char *name, int32_t v1, int32_t v2)
 {
-    glUniform2i(get_uniform_location(shader, name), v1, v2);
+    glUniform2i(__get_uniform_location_impl(shader, name), v1, v2);
 }
 
 void shader_set_uniform_3i(const Shader *shader, const char *name, int32_t v1, int32_t v2, int32_t v3)
 {
-    glUniform3i(get_uniform_location(shader, name), v1, v2, v3);
+    glUniform3i(__get_uniform_location_impl(shader, name), v1, v2, v3);
 }
 
 void shader_set_uniform_4i(const Shader *shader, const char *name, int32_t v1, int32_t v2, int32_t v3, int32_t v4)
 {
-    glUniform4i(get_uniform_location(shader, name), v1, v2, v3, v4);
+    glUniform4i(__get_uniform_location_impl(shader, name), v1, v2, v3, v4);
 }
 
 void shader_set_uniform_1f(const Shader *shader, const char *name, float v)
 {
-    glUniform1f(get_uniform_location(shader, name), v);
+    glUniform1f(__get_uniform_location_impl(shader, name), v);
 }
 
 void shader_set_uniform_2f(const Shader *shader, const char *name, float v1, float v2)
 {
-    glUniform2f(get_uniform_location(shader, name), v1, v2);
+    glUniform2f(__get_uniform_location_impl(shader, name), v1, v2);
 }
 
 void shader_set_uniform_3f(const Shader *shader, const char *name, float v1, float v2, float v3)
 {
-    glUniform3f(get_uniform_location(shader, name), v1, v2, v3);
+    glUniform3f(__get_uniform_location_impl(shader, name), v1, v2, v3);
 }
 
 void shader_set_uniform_4f(const Shader *shader, const char *name, float v1, float v2, float v3, float v4)
 {
-    glUniform4f(get_uniform_location(shader, name), v1, v2, v3, v4);
+    glUniform4f(__get_uniform_location_impl(shader, name), v1, v2, v3, v4);
 }
 
 void shader_set_uniform_mat3(const Shader *shader, const char *name, float *values)
 {
-    glUniformMatrix3fv(get_uniform_location(shader, name), 1, GL_TRUE, values);
+    glUniformMatrix3fv(__get_uniform_location_impl(shader, name), 1, GL_TRUE, values);
 }
 
 void shader_set_uniform_mat4(const Shader *shader, const char *name, float *values)
 {
-    glUniformMatrix4fv(get_uniform_location(shader, name), 1, GL_TRUE, values);
+    glUniformMatrix4fv(__get_uniform_location_impl(shader, name), 1, GL_TRUE, values);
 }
 
 void shader_bind(const Shader *shader)

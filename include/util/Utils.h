@@ -1,11 +1,14 @@
 #pragma once
 
 #include"Core.h"
+#include"util/String.h"
 
 #include<stdint.h>
 
+#define IC_PI 3.14159265358979323846
+
 // Read source
-const char *read_source(const char *path, IC_ERROR_CODE *error_code);
+String read_source(const char *path, IC_ERROR_CODE *error_code);
 
 // Loader
 typedef struct _Loader_Data Loader_Data;
@@ -47,7 +50,3 @@ void timer_destroy(const Timer *timer);
 void timer_start(Timer *timer);
 IC_BOOL timer_should_update(Timer *timer);
 float timer_get_dt(const Timer *timer);
-
-// String utils
-const char **string_split(const char *str, char delim, uint32_t *num_splits);
-const char *string_trim(const char *str);

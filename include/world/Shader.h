@@ -1,6 +1,7 @@
 #pragma once
 
 #include"Core.h"
+#include"util/String.h"
 
 #include<stdint.h>
 
@@ -8,8 +9,8 @@ typedef struct _Shader_Data Shader_Data;
 
 struct _Shader
 {
-    const char *vertex_source;
-    const char *fragment_source;
+    String_View vertex_source;
+    String_View fragment_source;
 
     uint32_t num_uniforms;
 

@@ -1,9 +1,9 @@
 #pragma once
 
 #include"world/Shader.h"
-#include"math/Vec.h"
-#include"math/Mat.h"
-#include"math/Color.h"
+#include"util/math/Vec.h"
+#include"util/math/Mat.h"
+#include"util/Color.h"
 
 struct _Rect_Shader
 {

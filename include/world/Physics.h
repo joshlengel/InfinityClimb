@@ -1,6 +1,6 @@
 #pragma once
 
-#include"math/Vec.h"
+#include"util/math/Vec.h"
 
 struct _AABB
 {

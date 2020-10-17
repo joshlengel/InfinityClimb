@@ -1,21 +1,24 @@
 #pragma once
 
-#include"math/Vec.h"
+#include"util/math/Vec.h"
 
-typedef struct
+struct _Mat3
 {
     float m00, m01, m02;
     float m10, m11, m12;
     float m20, m21, m22;
-} Mat3;
+};
 
-typedef struct
+struct _Mat4
 {
     float m00, m01, m02, m03;
     float m10, m11, m12, m13;
     float m20, m21, m22, m23;
     float m30, m31, m32, m33;
-} Mat4;
+};
+
+typedef struct _Mat3 Mat3;
+typedef struct _Mat4 Mat4;
 
 Mat3 mat3_identity();
 Mat4 mat4_identity();

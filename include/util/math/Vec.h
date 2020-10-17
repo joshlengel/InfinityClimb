@@ -1,25 +1,29 @@
 #pragma once
 
-typedef struct
+struct _Vec2
 {
     float x;
     float y;
-} Vec2;
+};
 
-typedef struct
+struct _Vec3
 {
     float x;
     float y;
     float z;
-} Vec3;
+};
 
-typedef struct
+struct _Vec4
 {
     float x;
     float y;
     float z;
     float w;
-} Vec4;
+};
+
+typedef struct _Vec2 Vec2;
+typedef struct _Vec3 Vec3;
+typedef struct _Vec4 Vec4;
 
 Vec2 vec2_add(const Vec2 *v1, const Vec2 *v2);
 Vec3 vec3_add(const Vec3 *v1, const Vec3 *v2);

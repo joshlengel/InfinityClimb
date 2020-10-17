@@ -1,8 +1,8 @@
 #pragma once
 
 #include"Core.h"
-#include"math/Vec.h"
-#include"math/Mat.h"
+#include"util/math/Vec.h"
+#include"util/math/Mat.h"
 #include"world/Physics.h"
 
 typedef struct _Rect_Data Rect_Data;

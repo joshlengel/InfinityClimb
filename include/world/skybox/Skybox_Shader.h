@@ -1,7 +1,7 @@
 #pragma once
 
 #include"world/Shader.h"
-#include"math/Mat.h"
+#include"util/math/Mat.h"
 #include"Core.h"
 
 struct _Skybox_Shader

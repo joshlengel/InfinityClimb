@@ -8,7 +8,7 @@
 #include"world/player/Player.h"
 #include"window/Window.h"
 
-#include"math/Color.h"
+#include"util/Color.h"
 
 #include<stdlib.h>
 #include<assert.h>

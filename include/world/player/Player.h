@@ -2,7 +2,7 @@
 
 #include"window/Input.h"
 #include"world/Physics.h"
-#include"math/Vec.h"
+#include"util/math/Vec.h"
 
 enum _Player_Type
 {

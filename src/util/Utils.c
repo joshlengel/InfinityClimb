@@ -1,4 +1,4 @@
-#include"Utils.h"
+#include"util/Utils.h"
 #include"Log.h"
 
 #include<stdio.h>
@@ -15,15 +15,19 @@
 
 const int MAX_BUFFER_SIZE = 256;
 
-const char *read_source(const char *path, IC_ERROR_CODE *error_code)
+String read_source(const char *path, IC_ERROR_CODE *error_code)
 {
+    String res;
+    res.c_str = NULL;
+    res.length = 0;
+
     FILE *file = fopen(path, "rb");
 
     if (!file)
     {
         log_trace("Error opening source at '%s'", path);
         if (error_code) *error_code = IC_READ_OPEN_FILE_ERROR;
-        return NULL;
+        return res;
     }
 
     if (fseek(file, 0L, SEEK_END) != 0)
@@ -31,7 +35,7 @@ const char *read_source(const char *path, IC_ERROR_CODE *error_code)
         log_trace("Error reading source file size at '%s'. Make sure the source file is no larger than 4GB.", path);
         fclose(file);
         if (error_code) *error_code = IC_READ_FILE_SIZE_ERROR;
-        return NULL;
+        return res;
     }
 
     long size = ftell(file);
@@ -41,7 +45,7 @@ const char *read_source(const char *path, IC_ERROR_CODE *error_code)
         log_trace("Error reading source file size at '%s'. Make sure the source file is no larger than 4GB.", path);
         fclose(file);
         if (error_code) *error_code = IC_READ_FILE_SIZE_ERROR;
-        return NULL;
+        return res;
     }
 
     if (fseek(file, 0L, SEEK_SET) != 0)
@@ -49,21 +53,23 @@ const char *read_source(const char *path, IC_ERROR_CODE *error_code)
         log_trace("Error reading source file size at '%s'. Make sure the source file is no larger than 4GB.", path);
         fclose(file);
         if (error_code) *error_code = IC_READ_FILE_SIZE_ERROR;
-        return NULL;
+        return res;
     }
 
-    char *source = malloc(sizeof(char) * (size + 1));
+    res.c_str = malloc(sizeof(char) * (size + 1));
     
-    if (!fread(source, sizeof(char), size, file))
+    if (!fread(res.c_str, sizeof(char), size, file))
     {
         log_trace("Error reading source file contents at '%s'.", path);
         fclose(file);
-        free(source);
+        free(res.c_str);
+        res.c_str = NULL;
         if (error_code) *error_code = IC_READ_ERROR;
-        return NULL;
+        return res;
     }
 
-    source[size] = '\0';
+    res.length = size;
+    res.c_str[size] = '\0';
 
     if (fclose(file) != 0)
     {
@@ -74,8 +80,8 @@ const char *read_source(const char *path, IC_ERROR_CODE *error_code)
     {
         if (error_code) *error_code = IC_NO_ERROR;
     }
-    
-    return source;
+
+    return res;
 }
 
 struct _Loader_Data
@@ -224,86 +230,4 @@ IC_BOOL timer_should_update(Timer *timer)
 float timer_get_dt(const Timer *timer)
 {
     return timer->_diff;
-}
-
-const char **string_split(const char *str, char delim, uint32_t *num_splits)
-{
-    char **arr = malloc(sizeof(const char*) * 10);
-    uint32_t arr_size = 10;
-    uint32_t arr_index = 0;
-
-    const char *sub_str = str;
-    uint32_t sub_str_len = 0;
-
-    while (*str != '\0')
-    {
-        if (*str == delim)
-        {
-            if (sub_str_len > 0)
-            {
-                if (arr_index == arr_size)
-                {
-                    arr = realloc(arr, sizeof(const char*) * (arr_size *= 2));
-                }
-
-                char **res_str = arr + arr_index++;
-                *res_str = malloc(sizeof(char) * (sub_str_len + 1));
-                memcpy(*res_str, sub_str, sub_str_len);
-                (*res_str)[sub_str_len] = '\0';
-
-                sub_str_len = 0;
-            }
-
-            sub_str = ++str;
-        }
-        else
-        {
-            ++str;
-            ++sub_str_len;   
-        }
-    }
-
-    if (sub_str_len > 0)
-    {
-        if (arr_index == arr_size)
-        {
-            arr = realloc(arr, sizeof(const char*) * (arr_size += 1));
-        }
-
-        char **str = arr + arr_index++;
-        *str = malloc(sizeof(char) * (sub_str_len + 1));
-        memcpy(*str, sub_str, sub_str_len);
-        (*str)[sub_str_len] = '\0';
-    }
-
-    *num_splits = arr_index;
-    return (const char**)arr;
-}
-
-const char *string_trim(const char *str)
-{
-    const char *start = str;
-    
-    while (*(str++) == ' ') ++start;
-
-    const char *end = start;
-    const char *end_temp = start;
-
-    while (IC_TRUE)
-    {
-        while (*end != ' ' && *end != '\0') ++end;
-        end_temp = end;
-        while (*end_temp == ' ') ++end_temp;
-
-        if (*end_temp == '\0')
-            break;
-        else
-            end = end_temp;
-    }
-
-    uint32_t length = (end - start) / sizeof(char);
-    char *res = malloc(sizeof(char) * (length + 1));
-    memcpy(res, start, length);
-    res[length] = '\0';
-    return res;
 }

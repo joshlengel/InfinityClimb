@@ -1,8 +1,8 @@
 #pragma once
 
 #include"window/Input.h"
-#include"math/Vec.h"
-#include"math/Mat.h"
+#include"util/math/Vec.h"
+#include"util/math/Mat.h"
 
 struct _Camera
 {

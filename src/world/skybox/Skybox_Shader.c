@@ -1,6 +1,6 @@
 #include"world/skybox/Skybox_Shader.h"
 #include"world/skybox/Skybox.h"
-#include"Utils.h"
+#include"util/Utils.h"
 
 #include<stdlib.h>
 
@@ -8,11 +8,18 @@ IC_ERROR_CODE skybox_shader_create(Skybox_Shader *dest)
 {
     IC_ERROR_CODE ec;
 
-    dest->shader.vertex_source = read_source("../assets/shaders/skybox.vert", &ec);
+    String v_src = read_source("../assets/shaders/skybox.vert", &ec);
     if (ec != IC_NO_ERROR) return ec;
 
-    dest->shader.fragment_source = read_source("../assets/shaders/skybox.frag", &ec);
-    if (ec != IC_NO_ERROR) return ec;
+    String f_src = read_source("../assets/shaders/skybox.frag", &ec);
+    if (ec != IC_NO_ERROR)
+    {
+        string_destroy(&v_src);
+        return ec;
+    }
+
+    string_view_create_s(&dest->shader.vertex_source, &v_src, 0, UINT32_MAX);
+    string_view_create_s(&dest->shader.fragment_source, &f_src, 0, UINT32_MAX);
 
     dest->shader.num_uniforms = 3;
 
@@ -21,8 +28,8 @@ IC_ERROR_CODE skybox_shader_create(Skybox_Shader *dest)
     if (ec != IC_NO_ERROR) return ec;
 
     // Delete allocated strings for shader source code
-    free((void*)dest->shader.vertex_source);
-    free((void*)dest->shader.fragment_source);
+    string_destroy(&v_src);
+    string_destroy(&f_src);
 
     // Declare shader uniforms
     shader_declare_uniform(&dest->shader, "view");

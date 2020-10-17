@@ -1,5 +1,5 @@
 #include"window/Context.h"
-#include"math/Color.h"
+#include"util/Color.h"
 
 #include<glad/glad.h>
 

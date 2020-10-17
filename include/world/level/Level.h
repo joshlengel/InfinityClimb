@@ -1,7 +1,8 @@
 #pragma once
 
+#include"util/math/Vec.h"
 #include"Core.h"
-#include"math/Vec.h"
+
 #include<stdint.h>
 
 typedef struct _Rect Rect;
