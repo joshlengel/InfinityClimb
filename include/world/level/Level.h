@@ -2,7 +2,6 @@
 
 #include"Core.h"
 #include"math/Vec.h"
-
 #include<stdint.h>
 
 typedef struct _Rect Rect;
@@ -32,8 +31,12 @@ struct _Level
 typedef struct _Level Level;
 
 IC_ERROR_CODE level_create(Level *dest);
+IC_ERROR_CODE level_create_from_rects(Level *dest);
 void level_destroy(const Level *level);
 
-void level_add_rect(const Level *level, const Rect *rect);
+IC_ERROR_CODE level_load(const Level *level);
+void level_unload(const Level *level);
+
+void level_add_rect(const Level *level, Rect rect);
 void level_update(const Level *level, float dt);
 void level_render(const Level *level);
