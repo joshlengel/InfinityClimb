@@ -225,3 +225,85 @@ float timer_get_dt(const Timer *timer)
 {
     return timer->_diff;
 }
+
+const char **string_split(const char *str, char delim, uint32_t *num_splits)
+{
+    char **arr = malloc(sizeof(const char*) * 10);
+    uint32_t arr_size = 10;
+    uint32_t arr_index = 0;
+
+    const char *sub_str = str;
+    uint32_t sub_str_len = 0;
+
+    while (*str != '\0')
+    {
+        if (*str == delim)
+        {
+            if (sub_str_len > 0)
+            {
+                if (arr_index == arr_size)
+                {
+                    arr = realloc(arr, sizeof(const char*) * (arr_size *= 2));
+                }
+
+                char **res_str = arr + arr_index++;
+                *res_str = malloc(sizeof(char) * (sub_str_len + 1));
+                memcpy(*res_str, sub_str, sub_str_len);
+                (*res_str)[sub_str_len] = '\0';
+
+                sub_str_len = 0;
+            }
+
+            sub_str = ++str;
+        }
+        else
+        {
+            ++str;
+            ++sub_str_len;   
+        }
+    }
+
+    if (sub_str_len > 0)
+    {
+        if (arr_index == arr_size)
+        {
+            arr = realloc(arr, sizeof(const char*) * (arr_size += 1));
+        }
+
+        char **str = arr + arr_index++;
+        *str = malloc(sizeof(char) * (sub_str_len + 1));
+        memcpy(*str, sub_str, sub_str_len);
+        (*str)[sub_str_len] = '\0';
+    }
+
+    *num_splits = arr_index;
+    return (const char**)arr;
+}
+
+const char *string_trim(const char *str)
+{
+    const char *start = str;
+    
+    while (*(str++) == ' ') ++start;
+
+    const char *end = start;
+    const char *end_temp = start;
+
+    while (IC_TRUE)
+    {
+        while (*end != ' ' && *end != '\0') ++end;
+        end_temp = end;
+        while (*end_temp == ' ') ++end_temp;
+
+        if (*end_temp == '\0')
+            break;
+        else
+            end = end_temp;
+    }
+
+    uint32_t length = (end - start) / sizeof(char);
+    char *res = malloc(sizeof(char) * (length + 1));
+    memcpy(res, start, length);
+    res[length] = '\0';
+    return res;
+}

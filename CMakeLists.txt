@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.12)
 
 project(InfinityClimb VERSION 1.0)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror")
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
 # Files
 set(IC_ROOT "${CMAKE_CURRENT_SOURCE_DIR}")
 set(IC_DEPS "${IC_ROOT}/deps")
@@ -17,15 +21,16 @@ set(sources
     "window/Window.c"
     "window/Input.c"
     "window/Context.c"
+    "world/Shader.c"
+    "world/Camera.c"
+    "world/Physics.c"
     "world/rect/Rect.c"
     "world/rect/Rect_Shader.c"
     "world/player/Player.c"
     "world/skybox/Skybox.c"
     "world/skybox/Skybox_Shader.c"
-    "world/Shader.c"
-    "world/Camera.c"
-    "world/Physics.c"
-    "world/Level.c"
+    "world/level/Level.c"
+    "world/level/Level_Parser.c"
 )
 
 list(TRANSFORM sources PREPEND "${IC_ROOT}/src/")

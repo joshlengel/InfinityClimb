@@ -47,3 +47,7 @@ void timer_destroy(const Timer *timer);
 void timer_start(Timer *timer);
 IC_BOOL timer_should_update(Timer *timer);
 float timer_get_dt(const Timer *timer);
+
+// String utils
+const char **string_split(const char *str, char delim, uint32_t *num_splits);
+const char *string_trim(const char *str);

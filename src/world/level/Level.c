@@ -1,4 +1,5 @@
-#include"world/Level.h"
+#include"world/level/Level.h"
+#include"world/level/Level_Mmt.h"
 
 #include"world/Camera.h"
 #include"world/Physics.h"
@@ -12,17 +13,37 @@
 #include<stdlib.h>
 #include<assert.h>
 
-struct _Level_Data
+void __level_init_impl(Level *dest)
 {
-    const Rect **rects;
-    uint32_t num_rects, rect_index;
-};
+    dest->data->loader.num_resources = dest->data->num_rects;
+    loader_create(&dest->data->loader);
+
+    Rect *itr = dest->data->rects;
+    for (uint32_t i = 0; i < dest->data->num_rects; ++i)
+    {
+        loader_add_resource(&dest->data->loader, itr++, (Loader_Init_proc)rect_create, (Loader_Dest_proc)rect_destroy);
+    }
+}
+
+IC_ERROR_CODE level_create_from_rects(Level *dest)
+{
+    dest->camera->position = dest->start_position;
+    dest->camera->pitch = dest->start_pitch;
+    dest->camera->yaw = dest->start_yaw;
+
+    dest->player->position = dest->start_position;
+    dest->player->pitch = dest->start_pitch;
+    dest->player->yaw = dest->start_yaw;
+
+    __level_init_impl(dest);
+    return IC_NO_ERROR;
+}
 
 IC_ERROR_CODE level_create(Level *dest)
 {
     Level_Data *data = malloc(sizeof(Level_Data));
     dest->data = data;
-    data->rects = malloc(sizeof(Rect*) * dest->num_rects);
+    data->rects = malloc(sizeof(Rect) * dest->num_rects);
     data->num_rects = dest->num_rects;
     data->rect_index = 0;
 
@@ -34,16 +55,30 @@ IC_ERROR_CODE level_create(Level *dest)
     dest->player->pitch = dest->start_pitch;
     dest->player->yaw = dest->start_yaw;
 
+    __level_init_impl(dest);
     return IC_NO_ERROR;
 }
 
 void level_destroy(const Level *level)
 {
+    loader_destroy(&level->data->loader);
+
     free(level->data->rects);
     free(level->data);
 }
 
-void level_add_rect(const Level *level, const Rect *rect)
+IC_ERROR_CODE level_load(const Level *level)
+{
+    loader_load(&level->data->loader);
+    return loader_error(&level->data->loader);
+}
+
+void level_unload(const Level *level)
+{
+    loader_unload(&level->data->loader);
+}
+
+void level_add_rect(const Level *level, Rect rect)
 {
     assert(level->data->rect_index < level->data->num_rects);
 
@@ -65,10 +100,10 @@ void level_update(const Level *level, float dt)
         min_result.obj1_vel = level->player->velocity;
         min_result.obj1_accum_vel = level->player->accum_velocity;
 
-        const Rect **itr = level->data->rects;
+        Rect *itr = level->data->rects;
         for (uint32_t i = 0; i < level->data->num_rects; ++i)
         {
-            const Rect *rect = *(itr++);
+            Rect *rect = itr++;
 
             Collision_Result result = physics_collide(&level->player->aabb, &level->player->velocity, &level->player->accum_velocity, &rect->aabb, time_left);
             if (result.time_simulated < min_result.time_simulated)
@@ -103,10 +138,10 @@ void level_render(const Level *level)
     rect_shader_set_color(level->rect_shader, &rect_color);
     rect_shader_set_light(level->rect_shader, &level->light_dir);
     
-    const Rect **itr = level->data->rects;
+    Rect *itr = level->data->rects;
     for (uint32_t i = 0; i < level->data->num_rects; ++i)
     {
-        const Rect *rect = *(itr++);
+        Rect *rect = itr++;
 
         rect_shader_set_rect(level->rect_shader, rect);
 

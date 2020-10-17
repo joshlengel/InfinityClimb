@@ -1,0 +1,4 @@
+player start_x=0 start_y=1 start_z=0 start_pitch=0 start_yaw=0
+
+rect center_x=0   center_y=-0.2 center_z=0     h_width=1   h_height=0.2 h_depth=1
+rect center_x=0.5 center_y=0.2  center_z=-0.25 h_width=0.3 h_height=0.2 h_depth=0.5
