@@ -91,4 +91,10 @@ void player_controller_update(const Player_Controller *controller, const Input *
     d_vel = vec3_add(&d_vel, &d_accum_vel);
 
     controller->player->velocity = vec3_add(&controller->player->velocity, &d_vel);
+
+    Vec3 d_pos = vec3_scale(&controller->player->velocity, dt);
+    Vec3 d_accum_pos = vec3_scale(&controller->player->accum_velocity, dt);
+    d_pos = vec3_add(&d_pos, &d_accum_pos);
+
+    controller->player->position = vec3_add(&controller->player->position, &d_pos);
 }

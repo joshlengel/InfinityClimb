@@ -23,16 +23,13 @@ set(sources
     "window/Window.c"
     "window/Input.c"
     "window/Context.c"
-    "world/Shader.c"
     "world/Camera.c"
-    "world/Physics.c"
-    "world/rect/Rect.c"
-    "world/rect/Rect_Shader.c"
+    "world/model/Shader.c"
+    "world/model/mesh/Mesh.c"
+    "world/model/mesh/Mesh_Shader.c"
+    "world/model/skybox/Skybox.c"
+    "world/model/skybox/Skybox_Shader.c"
     "world/player/Player.c"
-    "world/skybox/Skybox.c"
-    "world/skybox/Skybox_Shader.c"
-    "world/level/Level.c"
-    "world/level/Level_Parser.c"
 )
 
 list(TRANSFORM sources PREPEND "${IC_ROOT}/src/")

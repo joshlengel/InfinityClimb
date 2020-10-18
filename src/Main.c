@@ -5,14 +5,11 @@
 #include"window/Input.h"
 #include"window/Context.h"
 #include"world/Camera.h"
-#include"world/Physics.h"
-#include"world/rect/Rect.h"
-#include"world/rect/Rect_Shader.h"
-#include"world/skybox/Skybox.h"
-#include"world/skybox/Skybox_Shader.h"
+#include"world/model/skybox/Skybox.h"
+#include"world/model/skybox/Skybox_Shader.h"
+#include"world/model/mesh/Mesh.h"
+#include"world/model/mesh/Mesh_Shader.h"
 #include"world/player/Player.h"
-#include"world/level/Level.h"
-#include"world/level/Level_Parser.h"
 #include"Libs.h"
 #include"Log.h"
 
@@ -26,13 +23,13 @@ Window window;
 Context context;
 Input input;
 
-Rect_Shader rect_shader;
-
 Camera camera;
 Player player;
 Player_Controller player_controller;
 
-Level level;
+Mesh mesh;
+Mesh_Shader mesh_shader;
+
 Skybox skybox;
 Skybox_Shader skybox_shader;
 
@@ -69,15 +66,90 @@ int init()
     context.cull = IC_TRUE;
     context.cull_front = IC_FALSE;
 
-    // Level
-    level.window = &window;
-    level.camera = &camera;
-    level.rect_shader = &rect_shader;
-    level.player = &player;
+    // Mesh
+    float mesh_vertices[] =
+    {
+        -1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f, -1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f, -1.0f,
 
-    level.light_position = LIGHT_POSITION;
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f,  1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f,  1.0f,
 
-    level_create_from_file("../assets/levels/example.lvl", &level);
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+
+        -1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+
+        -1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+        
+         1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f
+    };
+
+    float mesh_normals[] =
+    {
+        -1.0f,  0.0f,  0.0f,
+        -1.0f,  0.0f,  0.0f,
+        -1.0f,  0.0f,  0.0f,
+        -1.0f,  0.0f,  0.0f,
+
+         1.0f,  0.0f,  0.0f,
+         1.0f,  0.0f,  0.0f,
+         1.0f,  0.0f,  0.0f,
+         1.0f,  0.0f,  0.0f,
+
+         0.0f, -1.0f,  0.0f,
+         0.0f, -1.0f,  0.0f,
+         0.0f, -1.0f,  0.0f,
+         0.0f, -1.0f,  0.0f,
+
+         0.0f,  1.0f,  0.0f,
+         0.0f,  1.0f,  0.0f,
+         0.0f,  1.0f,  0.0f,
+         0.0f,  1.0f,  0.0f,
+
+         0.0f,  0.0f, -1.0f,
+         0.0f,  0.0f, -1.0f,
+         0.0f,  0.0f, -1.0f,
+         0.0f,  0.0f, -1.0f,
+
+         0.0f,  0.0f,  1.0f,
+         0.0f,  0.0f,  1.0f,
+         0.0f,  0.0f,  1.0f,
+         0.0f,  0.0f,  1.0f
+    };
+
+    uint32_t mesh_indices[] =
+    {
+         0,  1,  3,  0,  3,  2,
+         4,  5,  7,  4,  7,  6,
+         8,  9, 11,  8, 11, 10,
+        12, 13, 15, 12, 15, 14,
+        16, 17, 19, 16, 19, 18,
+        20, 21, 23, 20, 23, 22
+    };
+
+    mesh.vertices       = mesh_vertices;
+    mesh.texture_coords = NULL;
+    mesh.normals        = mesh_normals;
+    mesh.num_vertices   = 24;
+
+    mesh.indices     = mesh_indices;
+    mesh.num_indices = 36;
 
     // Skybox
     skybox.left_tex_path   = "../assets/textures/left.png";
@@ -96,10 +168,10 @@ int init()
     loader_add_resource(&loader, &window,        (Loader_Init_proc)window_create,           (Loader_Dest_proc)window_destroy);
     loader_add_resource(&loader, &input,         (Loader_Init_proc)input_create,            (Loader_Dest_proc)input_destroy);
     loader_add_resource(&loader, &context,       (Loader_Init_proc)context_create,          (Loader_Dest_proc)context_destroy);
-    loader_add_resource(&loader, &rect_shader,   (Loader_Init_proc)rect_shader_create,      (Loader_Dest_proc)rect_shader_destroy);
-    loader_add_resource(&loader, &level,         (Loader_Init_proc)level_create_from_rects, (Loader_Dest_proc)level_destroy);
     loader_add_resource(&loader, &skybox,        (Loader_Init_proc)skybox_create,           (Loader_Dest_proc)skybox_destroy);
     loader_add_resource(&loader, &skybox_shader, (Loader_Init_proc)skybox_shader_create,    (Loader_Dest_proc)skybox_shader_destroy);
+    loader_add_resource(&loader, &mesh,          (Loader_Init_proc)mesh_create,             (Loader_Dest_proc)mesh_destroy);
+    loader_add_resource(&loader, &mesh_shader,   (Loader_Init_proc)mesh_shader_create,      (Loader_Dest_proc)mesh_shader_destroy);
     loader_load(&loader);
 
     if (loader_error(&loader) != IC_NO_ERROR) return -1;
@@ -108,15 +180,14 @@ int init()
     context_update(&context);
 
     // Initialize world aspects (Light, Camera, etc.)
-    level_load(&level);
-
     camera.fov = (float)70 / (float)180 * IC_PI;
 
-    player.type = IC_PLAYER_NORMAL;
+    player.type = IC_PLAYER_SUPER;
 
+    /*
     player.aabb.extent.x = 0.1f;
     player.aabb.extent.y = 0.3f;
-    player.aabb.extent.z = 0.1f;
+    player.aabb.extent.z = 0.1f;*/
     
     player_controller.player = &player;
     player_controller.xz_speed = 1.5f;
@@ -178,10 +249,13 @@ int main(int argc, char **argv)
             // Player movement
             player_controller_update(&player_controller, &input, dt);
 
-            level_update(&level, dt);
+            camera.position = player.position;
+            camera.pitch = player.pitch;
+            camera.yaw = player.yaw;
         }
 
         context.cull_front = IC_TRUE;
+        context.cull = IC_FALSE;
         context_update(&context);
 
         Mat4 view = camera_view_matrix(&camera);
@@ -195,12 +269,17 @@ int main(int argc, char **argv)
         context.cull_front = IC_FALSE;
         context_update(&context);
 
-        level_render(&level);
+        Mat4 mesh_transform = mat4_identity();
+
+        mesh_shader_bind(&mesh_shader);
+        mesh_shader_set_transform(&mesh_shader, &mesh_transform);
+        mesh_shader_set_view(&mesh_shader, &view);
+        mesh_shader_set_projection(&mesh_shader, &projection);
+        mesh_render(&mesh);
 
         window_swap_buffers(&window);
     }
 
-    level_unload(&level);
     loader_unload(&loader);
     loader_destroy(&loader);
 
