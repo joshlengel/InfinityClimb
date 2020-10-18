@@ -35,3 +35,5 @@ void mat4_load(const Mat4 *m, float *buffer);
 Mat4 mat4_make_scale(float sx, float sy, float sz);
 Mat4 mat4_make_translate(float tx, float ty, float tz);
 Mat4 mat4_make_project(float fov, float aspect_ratio, float clip_near, float clip_far);
+
+Mat4 mat4_make_axis_angle(const Vec3 *axis, float rotation);

@@ -134,3 +134,23 @@ Mat4 mat4_make_project(float fov, float aspect_ratio, float clip_near, float cli
 
     return res;
 }
+
+Mat4 mat4_make_axis_angle(const Vec3 *axis, float rotation)
+{
+    float sin_a = sinf(rotation);
+    float cos_a = cosf(rotation);
+    float cos_1_a = 1 - cos_a;
+
+    Mat4 res = mat4_identity();
+    res.m00 = cos_a + axis->x * axis->x * cos_1_a;
+    res.m10 = axis->x * axis->y * cos_1_a - axis->z * sin_a;
+    res.m20 = axis->x * axis->z * cos_1_a + axis->y * sin_a;
+    res.m01 = axis->x * axis->y * cos_1_a + axis->z * sin_a;
+    res.m11 = cos_a + axis->y * axis->y * cos_1_a;
+    res.m21 = axis->y * axis->z * cos_1_a - axis->x * sin_a;
+    res.m02 = axis->x * axis->z * cos_1_a - axis->y * sin_a;
+    res.m12 = axis->y * axis->z * cos_1_a + axis->x * sin_a;
+    res.m22 = cos_a + axis->z * axis->z * cos_1_a;
+
+    return res;
+}

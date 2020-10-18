@@ -5,6 +5,7 @@
 #include"window/Input.h"
 #include"window/Context.h"
 #include"world/Camera.h"
+#include"world/model/Model.h"
 #include"world/model/skybox/Skybox.h"
 #include"world/model/skybox/Skybox_Shader.h"
 #include"world/model/mesh/Mesh.h"
@@ -29,6 +30,7 @@ Player_Controller player_controller;
 
 Mesh mesh;
 Mesh_Shader mesh_shader;
+Model model;
 
 Skybox skybox;
 Skybox_Shader skybox_shader;
@@ -151,6 +153,11 @@ int init()
     mesh.indices     = mesh_indices;
     mesh.num_indices = 36;
 
+    model.mesh = &mesh;
+    model.scale.x = 1.0f;
+    model.scale.y = 1.0f;
+    model.scale.z = 1.0f;
+
     // Skybox
     skybox.left_tex_path   = "../assets/textures/left.png";
     skybox.right_tex_path  = "../assets/textures/right.png";
@@ -183,6 +190,8 @@ int init()
     camera.fov = (float)70 / (float)180 * IC_PI;
 
     player.type = IC_PLAYER_SUPER;
+    player.position.y = 2.0f;
+    player.position.z = -3.0f;
 
     /*
     player.aabb.extent.x = 0.1f;
@@ -255,7 +264,6 @@ int main(int argc, char **argv)
         }
 
         context.cull_front = IC_TRUE;
-        context.cull = IC_FALSE;
         context_update(&context);
 
         Mat4 view = camera_view_matrix(&camera);
@@ -269,13 +277,13 @@ int main(int argc, char **argv)
         context.cull_front = IC_FALSE;
         context_update(&context);
 
-        Mat4 mesh_transform = mat4_identity();
+        Mat4 model_transform = model_transform_matrix(&model);
 
         mesh_shader_bind(&mesh_shader);
-        mesh_shader_set_transform(&mesh_shader, &mesh_transform);
+        mesh_shader_set_transform(&mesh_shader, &model_transform);
         mesh_shader_set_view(&mesh_shader, &view);
         mesh_shader_set_projection(&mesh_shader, &projection);
-        mesh_render(&mesh);
+        model_render(&model);
 
         window_swap_buffers(&window);
     }
