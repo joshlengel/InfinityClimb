@@ -28,7 +28,7 @@ Input input;
 Camera camera;
 Player player;
 Player_Controller player_controller;
-Sphere player_sphere;
+Capsule player_capsule;
 
 Mesh mesh;
 Mesh_Shader mesh_shader;
@@ -195,7 +195,8 @@ int init()
     player.type = IC_PLAYER_SUPER;
     player.position.y = 2.0f;
 
-    player_sphere.radius = 0.2f;
+    player_capsule.body_height = 1.2f;
+    player_capsule.radius = 0.2f;
 
     /*
     player.aabb.extent.x = 0.1f;
@@ -263,7 +264,7 @@ int main(int argc, char **argv)
             player_controller_update(&player_controller, &input, dt);
 
             // Collision
-            Collision_Result result = collide_sphere_with_static(&player_sphere, &model, &player, dt);
+            Collision_Result result = collide_capsule_with_static(&player_capsule, &model, &player, dt);
             player.position = vec3_add(&player.position, &result.displacement);
             player.velocity = result.res_velocity;
 
@@ -292,6 +293,12 @@ int main(int argc, char **argv)
         mesh_shader_set_transform(&mesh_shader, &model_transform);
         mesh_shader_set_view(&mesh_shader, &view);
         mesh_shader_set_projection(&mesh_shader, &projection);
+        model_render(&model);
+
+        model_transform = mat4_make_scale(0.4f, 0.4f, 0.4f);
+        Mat4 trnt = mat4_make_translate(-0.5f, 1.4f, 0.25f);
+        model_transform = mat4_mul(&trnt, &model_transform);
+        mesh_shader_set_transform(&mesh_shader, &model_transform);
         model_render(&model);
 
         window_swap_buffers(&window);
