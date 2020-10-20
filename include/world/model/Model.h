@@ -2,14 +2,15 @@
 
 #include"util/math/Vec.h"
 #include"util/math/Mat.h"
+#include"world/model/physics/Collidable.h"
 
 typedef struct _Mesh Mesh;
-typedef struct _Collidable Collidable;
 
 struct _Model
 {
     const Mesh *mesh;
-    const Collidable *collidable;
+    Collidable collidable_type;
+    const void *collidable;
 
     Vec3 rotation_axis;
     float rotation;

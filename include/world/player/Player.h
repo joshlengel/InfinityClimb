@@ -17,9 +17,6 @@ struct _Player
     Vec3 velocity;
     Vec3 acceleration;
 
-    Vec3 accum_velocity;
-    Vec3 accum_acceleration;
-
     //AABB aabb;
 
     float mass;

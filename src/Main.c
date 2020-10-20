@@ -10,6 +10,7 @@
 #include"world/model/skybox/Skybox_Shader.h"
 #include"world/model/mesh/Mesh.h"
 #include"world/model/mesh/Mesh_Shader.h"
+#include"world/model/physics/Collidable.h"
 #include"world/player/Player.h"
 #include"Libs.h"
 #include"Log.h"
@@ -27,6 +28,7 @@ Input input;
 Camera camera;
 Player player;
 Player_Controller player_controller;
+Sphere player_sphere;
 
 Mesh mesh;
 Mesh_Shader mesh_shader;
@@ -37,6 +39,82 @@ Skybox_Shader skybox_shader;
 
 Vec3 LIGHT_POSITION = { -30.0f, 40.0f, 20.0f };
 Color SKY_COLOR;
+
+float mesh_vertices[] =
+{
+    -1.0f, -1.0f,  1.0f,
+    -1.0f, -1.0f, -1.0f,
+    -1.0f,  1.0f,  1.0f,
+    -1.0f,  1.0f, -1.0f,
+
+     1.0f, -1.0f, -1.0f,
+     1.0f, -1.0f,  1.0f,
+     1.0f,  1.0f, -1.0f,
+     1.0f,  1.0f,  1.0f,
+
+    -1.0f, -1.0f,  1.0f,
+     1.0f, -1.0f,  1.0f,
+    -1.0f, -1.0f, -1.0f,
+     1.0f, -1.0f, -1.0f,
+
+    -1.0f,  1.0f, -1.0f,
+     1.0f,  1.0f, -1.0f,
+    -1.0f,  1.0f,  1.0f,
+     1.0f,  1.0f,  1.0f,
+
+    -1.0f, -1.0f, -1.0f,
+     1.0f, -1.0f, -1.0f,
+    -1.0f,  1.0f, -1.0f,
+     1.0f,  1.0f, -1.0f,
+    
+     1.0f, -1.0f,  1.0f,
+    -1.0f, -1.0f,  1.0f,
+     1.0f,  1.0f,  1.0f,
+    -1.0f,  1.0f,  1.0f
+};
+
+float mesh_normals[] =
+{
+    -1.0f,  0.0f,  0.0f,
+    -1.0f,  0.0f,  0.0f,
+    -1.0f,  0.0f,  0.0f,
+    -1.0f,  0.0f,  0.0f,
+
+     1.0f,  0.0f,  0.0f,
+     1.0f,  0.0f,  0.0f,
+     1.0f,  0.0f,  0.0f,
+     1.0f,  0.0f,  0.0f,
+
+     0.0f, -1.0f,  0.0f,
+     0.0f, -1.0f,  0.0f,
+     0.0f, -1.0f,  0.0f,
+     0.0f, -1.0f,  0.0f,
+
+     0.0f,  1.0f,  0.0f,
+     0.0f,  1.0f,  0.0f,
+     0.0f,  1.0f,  0.0f,
+     0.0f,  1.0f,  0.0f,
+
+     0.0f,  0.0f, -1.0f,
+     0.0f,  0.0f, -1.0f,
+     0.0f,  0.0f, -1.0f,
+     0.0f,  0.0f, -1.0f,
+
+     0.0f,  0.0f,  1.0f,
+     0.0f,  0.0f,  1.0f,
+     0.0f,  0.0f,  1.0f,
+     0.0f,  0.0f,  1.0f
+};
+
+uint32_t mesh_indices[] =
+{
+     0,  1,  3,  0,  3,  2,
+     4,  5,  7,  4,  7,  6,
+     8,  9, 11,  8, 11, 10,
+    12, 13, 15, 12, 15, 14,
+    16, 17, 19, 16, 19, 18,
+    20, 21, 23, 20, 23, 22
+};
 
 int init()
 {
@@ -69,81 +147,6 @@ int init()
     context.cull_front = IC_FALSE;
 
     // Mesh
-    float mesh_vertices[] =
-    {
-        -1.0f, -1.0f,  1.0f,
-        -1.0f, -1.0f, -1.0f,
-        -1.0f,  1.0f,  1.0f,
-        -1.0f,  1.0f, -1.0f,
-
-         1.0f, -1.0f, -1.0f,
-         1.0f, -1.0f,  1.0f,
-         1.0f,  1.0f, -1.0f,
-         1.0f,  1.0f,  1.0f,
-
-        -1.0f, -1.0f,  1.0f,
-         1.0f, -1.0f,  1.0f,
-        -1.0f, -1.0f, -1.0f,
-         1.0f, -1.0f, -1.0f,
-
-        -1.0f,  1.0f, -1.0f,
-         1.0f,  1.0f, -1.0f,
-        -1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-
-        -1.0f, -1.0f, -1.0f,
-         1.0f, -1.0f, -1.0f,
-        -1.0f,  1.0f, -1.0f,
-         1.0f,  1.0f, -1.0f,
-        
-         1.0f, -1.0f,  1.0f,
-        -1.0f, -1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-        -1.0f,  1.0f,  1.0f
-    };
-
-    float mesh_normals[] =
-    {
-        -1.0f,  0.0f,  0.0f,
-        -1.0f,  0.0f,  0.0f,
-        -1.0f,  0.0f,  0.0f,
-        -1.0f,  0.0f,  0.0f,
-
-         1.0f,  0.0f,  0.0f,
-         1.0f,  0.0f,  0.0f,
-         1.0f,  0.0f,  0.0f,
-         1.0f,  0.0f,  0.0f,
-
-         0.0f, -1.0f,  0.0f,
-         0.0f, -1.0f,  0.0f,
-         0.0f, -1.0f,  0.0f,
-         0.0f, -1.0f,  0.0f,
-
-         0.0f,  1.0f,  0.0f,
-         0.0f,  1.0f,  0.0f,
-         0.0f,  1.0f,  0.0f,
-         0.0f,  1.0f,  0.0f,
-
-         0.0f,  0.0f, -1.0f,
-         0.0f,  0.0f, -1.0f,
-         0.0f,  0.0f, -1.0f,
-         0.0f,  0.0f, -1.0f,
-
-         0.0f,  0.0f,  1.0f,
-         0.0f,  0.0f,  1.0f,
-         0.0f,  0.0f,  1.0f,
-         0.0f,  0.0f,  1.0f
-    };
-
-    uint32_t mesh_indices[] =
-    {
-         0,  1,  3,  0,  3,  2,
-         4,  5,  7,  4,  7,  6,
-         8,  9, 11,  8, 11, 10,
-        12, 13, 15, 12, 15, 14,
-        16, 17, 19, 16, 19, 18,
-        20, 21, 23, 20, 23, 22
-    };
 
     mesh.vertices       = mesh_vertices;
     mesh.texture_coords = NULL;
@@ -191,7 +194,8 @@ int init()
 
     player.type = IC_PLAYER_SUPER;
     player.position.y = 2.0f;
-    player.position.z = -3.0f;
+
+    player_sphere.radius = 0.2f;
 
     /*
     player.aabb.extent.x = 0.1f;
@@ -199,8 +203,8 @@ int init()
     player.aabb.extent.z = 0.1f;*/
     
     player_controller.player = &player;
-    player_controller.xz_speed = 1.5f;
-    player_controller.y_speed = 3.0f;
+    player_controller.xz_speed = 0.5f;
+    player_controller.y_speed = 2.0f;
     player_controller.mouse_sensitivity = 0.001f;
 
     player_controller.forward_key  = IC_KEY_W;
@@ -257,6 +261,11 @@ int main(int argc, char **argv)
 
             // Player movement
             player_controller_update(&player_controller, &input, dt);
+
+            // Collision
+            Collision_Result result = collide_sphere_with_static(&player_sphere, &model, &player, dt);
+            player.position = vec3_add(&player.position, &result.displacement);
+            player.velocity = result.res_velocity;
 
             camera.position = player.position;
             camera.pitch = player.pitch;
