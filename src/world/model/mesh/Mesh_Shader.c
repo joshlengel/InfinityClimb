@@ -1,6 +1,7 @@
 #include"world/model/mesh/Mesh_Shader.h"
 
 #include"util/Utils.h"
+#include"util/Color.h"
 #include"util/math/Mat.h"
 
 IC_ERROR_CODE mesh_shader_create(Mesh_Shader *dest)
@@ -23,7 +24,7 @@ IC_ERROR_CODE mesh_shader_create(Mesh_Shader *dest)
     string_view_create_s(&dest->shader.vertex_source, &v_src, 0, UINT32_MAX);
     string_view_create_s(&dest->shader.fragment_source, &f_src, 0, UINT32_MAX);
 
-    dest->shader.num_uniforms = 3;
+    dest->shader.num_uniforms = 4;
 
     ec = shader_create(&dest->shader);
     if (ec != IC_NO_ERROR)
@@ -39,6 +40,7 @@ IC_ERROR_CODE mesh_shader_create(Mesh_Shader *dest)
     shader_declare_uniform(&dest->shader, "transform");
     shader_declare_uniform(&dest->shader, "view");
     shader_declare_uniform(&dest->shader, "projection");
+    shader_declare_uniform(&dest->shader, "base_color");
 
     return IC_NO_ERROR;
 }
@@ -72,4 +74,9 @@ void mesh_shader_set_projection(const Mesh_Shader *shader, const Mat4 *projectio
     float buffer[16];
     mat4_load(projection, buffer);
     shader_set_uniform_mat4(&shader->shader, "projection", buffer);
+}
+
+void mesh_shader_set_color(const Mesh_Shader *shader, const Color *color)
+{
+    shader_set_uniform_4f(&shader->shader, "base_color", color->red_f, color->green_f, color->blue_f, color->alpha_f);
 }

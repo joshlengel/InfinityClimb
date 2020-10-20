@@ -9,8 +9,6 @@ typedef struct _Mesh Mesh;
 struct _Model
 {
     const Mesh *mesh;
-    Collidable collidable_type;
-    const void *collidable;
 
     Vec3 rotation_axis;
     float rotation;

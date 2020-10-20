@@ -132,6 +132,8 @@ Collision_Result collide_sphere_with_static(const Sphere *sphere, const Model *m
     result.res_velocity = player->velocity;
     result.collision_depth = 0.0f;
 
+    Mat4 transform = model_transform_matrix(model);
+
     float rad_sqr = sphere->radius * sphere->radius;
 
     uint32_t num_indices = model->mesh->num_indices / 3;
@@ -143,9 +145,17 @@ Collision_Result collide_sphere_with_static(const Sphere *sphere, const Model *m
         const float *v1_itr = model->mesh->vertices + *(index_itr++) * 3;
         const float *v2_itr = model->mesh->vertices + *(index_itr++) * 3;
 
-        Vec3 p0 = { *(v0_itr++), *(v0_itr++), *(v0_itr) };
-        Vec3 p1 = { *(v1_itr++), *(v1_itr++), *(v1_itr) };
-        Vec3 p2 = { *(v2_itr++), *(v2_itr++), *(v2_itr) };
+        Vec4 p0_v4 = { *(v0_itr++), *(v0_itr++), *(v0_itr), 1.0f };
+        Vec4 p1_v4 = { *(v1_itr++), *(v1_itr++), *(v1_itr), 1.0f };
+        Vec4 p2_v4 = { *(v2_itr++), *(v2_itr++), *(v2_itr), 1.0f };
+
+        p0_v4 = mat4_transform(&transform, &p0_v4);
+        p1_v4 = mat4_transform(&transform, &p1_v4);
+        p2_v4 = mat4_transform(&transform, &p2_v4);
+
+        Vec3 p0 = { p0_v4.x, p0_v4.y, p0_v4.z };
+        Vec3 p1 = { p1_v4.x, p1_v4.y, p1_v4.z };
+        Vec3 p2 = { p2_v4.x, p2_v4.y, p2_v4.z };
 
         Vec3 edge1 = vec3_sub(&p1, &p0);
         Vec3 edge2 = vec3_sub(&p2, &p0);
@@ -173,6 +183,8 @@ Collision_Result collide_capsule_with_static(const Capsule *capsule, const Model
 
     float rad_sqr = capsule->radius * capsule->radius;
 
+    Mat4 transform = model_transform_matrix(model);
+
     Vec3 cap_norm = { 0.0f, 1.0f, 0.0f };
     Vec3 A = player->position;
     A.y -= capsule->body_height / 2;
@@ -193,9 +205,17 @@ Collision_Result collide_capsule_with_static(const Capsule *capsule, const Model
         const float *v1_itr = model->mesh->vertices + *(index_itr++) * 3;
         const float *v2_itr = model->mesh->vertices + *(index_itr++) * 3;
 
-        Vec3 p0 = { *(v0_itr++), *(v0_itr++), *(v0_itr) };
-        Vec3 p1 = { *(v1_itr++), *(v1_itr++), *(v1_itr) };
-        Vec3 p2 = { *(v2_itr++), *(v2_itr++), *(v2_itr) };
+        Vec4 p0_v4 = { *(v0_itr++), *(v0_itr++), *(v0_itr), 1.0f };
+        Vec4 p1_v4 = { *(v1_itr++), *(v1_itr++), *(v1_itr), 1.0f };
+        Vec4 p2_v4 = { *(v2_itr++), *(v2_itr++), *(v2_itr), 1.0f };
+
+        p0_v4 = mat4_transform(&transform, &p0_v4);
+        p1_v4 = mat4_transform(&transform, &p1_v4);
+        p2_v4 = mat4_transform(&transform, &p2_v4);
+
+        Vec3 p0 = { p0_v4.x, p0_v4.y, p0_v4.z };
+        Vec3 p1 = { p1_v4.x, p1_v4.y, p1_v4.z };
+        Vec3 p2 = { p2_v4.x, p2_v4.y, p2_v4.z };
 
         Vec3 edge1 = vec3_sub(&p1, &p0);
         Vec3 edge2 = vec3_sub(&p2, &p0);

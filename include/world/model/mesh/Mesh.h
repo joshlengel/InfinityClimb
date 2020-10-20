@@ -25,3 +25,5 @@ IC_ERROR_CODE mesh_create(Mesh *dest);
 void mesh_destroy(const Mesh *mesh);
 
 void mesh_render(const Mesh *mesh);
+
+Mesh mesh_load_from_obj(const char *path);

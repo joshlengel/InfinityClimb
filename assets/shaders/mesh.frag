@@ -8,7 +8,7 @@ precision mediump float;
 
 out vec4 color;
 
-const vec4 base_color = vec4(0.6, 0.6, 0.6, 1.0);
+uniform vec4 base_color;
 
 const vec3 light_color = vec3(1.0, 1.0, 1.0);
 const vec3 light_dir = normalize(vec3(-0.4, -0.8, 0.6));
