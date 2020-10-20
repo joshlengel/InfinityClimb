@@ -29,6 +29,7 @@ struct _Collision_Result
     /*float time_simulated;*/
     Vec3 res_velocity;
     Vec3 displacement;
+    float collision_depth;
 };
 
 typedef struct _AABB AABB;

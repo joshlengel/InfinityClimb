@@ -18,12 +18,18 @@ Vec3 closest_to_line(const Vec3 *a, const Vec3 *b, const Vec3 *point)
     return vec3_add(a, &d_ab);
 }
 
-void __collide_sphere_with_triangle_impl(const Sphere *sphere, Vec3 center, const Player *player, Vec3 p0, Vec3 p1, Vec3 p2, float rad_sqr, Vec3 N, Collision_Result *result)
+Collision_Result __collide_sphere_with_triangle_impl(const Sphere *sphere, Vec3 center, const Player *player, Vec3 p0, Vec3 p1, Vec3 p2, float rad_sqr, Vec3 N)
 {
+    Collision_Result result;
+    result.displacement.x = 0.0f;
+    result.displacement.y = 0.0f;
+    result.displacement.z = 0.0f;
+    result.collision_depth = 0.0f;
+
     Vec3 p0_center = vec3_sub(&center, &p0);
     float plane_dist = vec3_dot(&p0_center, &N);
 
-    if (plane_dist < -sphere->radius || plane_dist > sphere->radius) return;
+    if (plane_dist < -sphere->radius || plane_dist > sphere->radius) return result;
 
     Vec3 scaled_normal = vec3_scale(&N, plane_dist);
     Vec3 projected_center = vec3_sub(&center, &scaled_normal);
@@ -104,14 +110,17 @@ void __collide_sphere_with_triangle_impl(const Sphere *sphere, Vec3 center, cons
         Vec3 collision_normal = vec3_scale(&intersect_d, 1.0f / length); // normalize
         float collision_depth = sphere->radius - length;
         Vec3 response = vec3_scale(&collision_normal, collision_depth + 0.0001f);
-        result->displacement = vec3_add(&result->displacement, &response);
+        result.displacement = response;
+        result.collision_depth = collision_depth;
 
         float speed = vec3_length(&player->velocity);
         Vec3 vel_norm = vec3_scale(&player->velocity, 1.0f / speed);
-        Vec3 absorbed = vec3_scale(&collision_normal, vec3_dot(&vel_norm, &collision_normal));
-        Vec3 resulting = vec3_sub(&vel_norm, &absorbed);
-        result->res_velocity = vec3_scale(&resulting, speed);
+        Vec3 response_norm = vec3_scale(&collision_normal, vec3_dot(&vel_norm, &collision_normal));
+        Vec3 response_vel = vec3_scale(&response_norm, speed);
+        result.res_velocity = vec3_sub(&player->velocity, &response_vel);
     }
+
+    return result;
 }
 
 Collision_Result collide_sphere_with_static(const Sphere *sphere, const Model *model, const Player *player, float dt)
@@ -121,6 +130,7 @@ Collision_Result collide_sphere_with_static(const Sphere *sphere, const Model *m
     result.displacement.y = 0.0f;
     result.displacement.z = 0.0f;
     result.res_velocity = player->velocity;
+    result.collision_depth = 0.0f;
 
     float rad_sqr = sphere->radius * sphere->radius;
 
@@ -142,7 +152,11 @@ Collision_Result collide_sphere_with_static(const Sphere *sphere, const Model *m
         Vec3 N = vec3_cross(&edge1, &edge2);
         N = vec3_normalize(&N);
 
-        __collide_sphere_with_triangle_impl(sphere, player->position, player, p0, p1, p2, rad_sqr, N, &result);
+        Collision_Result res_tri = __collide_sphere_with_triangle_impl(sphere, player->position, player, p0, p1, p2, rad_sqr, N);
+        if (res_tri.collision_depth > result.collision_depth)
+        {
+            result = res_tri;
+        }
     }
 
     return result;
@@ -155,6 +169,7 @@ Collision_Result collide_capsule_with_static(const Capsule *capsule, const Model
     result.displacement.y = 0.0f;
     result.displacement.z = 0.0f;
     result.res_velocity = player->velocity;
+    result.collision_depth = 0.0f;
 
     float rad_sqr = capsule->radius * capsule->radius;
 
@@ -247,7 +262,11 @@ Collision_Result collide_capsule_with_static(const Capsule *capsule, const Model
         Vec3 center = closest_to_line(&A, &B, &ref_point);
         Sphere sphere = { capsule->radius };
 
-        __collide_sphere_with_triangle_impl(&sphere, center, player, p0, p1, p2, rad_sqr, N, &result);
+        Collision_Result res_tri = __collide_sphere_with_triangle_impl(&sphere, center, player, p0, p1, p2, rad_sqr, N);
+        if (res_tri.collision_depth > result.collision_depth)
+        {
+            result = res_tri;
+        }
     }
 
     return result;
