@@ -2,6 +2,7 @@
 
 #include"window/Input.h"
 #include"util/math/Vec.h"
+#include"Core.h"
 
 enum _Player_Type
 {
@@ -16,6 +17,7 @@ struct _Player
     Vec3 position;
     Vec3 velocity;
     Vec3 acceleration;
+    IC_BOOL hit_ground;
 
     //AABB aabb;
 

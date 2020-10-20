@@ -1,6 +1,7 @@
 #pragma once
 
 #include"util/math/Vec.h"
+#include"Core.h"
 
 struct _AABB
 {
@@ -30,6 +31,7 @@ struct _Collision_Result
     Vec3 res_velocity;
     Vec3 displacement;
     float collision_depth;
+    IC_BOOL hit_ground;
 };
 
 typedef struct _AABB AABB;

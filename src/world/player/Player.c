@@ -68,7 +68,7 @@ void player_controller_update(const Player_Controller *controller, const Input *
 
     if (controller->player->type == IC_PLAYER_NORMAL)
     {
-        controller->player->acceleration.y = -9.81f; // Gravity
+        controller->player->acceleration.y = -20.0f; // Gravity
     }
 
     // Euler integration
@@ -80,13 +80,22 @@ void player_controller_update(const Player_Controller *controller, const Input *
 
     if (controller->player->type == IC_PLAYER_NORMAL)
     {
-        controller->player->velocity = vec3_scale(&controller->player->velocity, 0.98f); // High drag
+        if (controller->player->hit_ground)
+        {
+            controller->player->velocity = vec3_scale(&controller->player->velocity, 0.9f); // High drag
+        }
+        else
+        {
+            controller->player->velocity.x = controller->player->velocity.x * 0.92f; // Low drag
+            controller->player->velocity.z = controller->player->velocity.z * 0.92f; // Low drag
+        }
     }
     else
     {
         controller->player->velocity = vec3_scale(&controller->player->velocity, 0.8f); // High drag
     }
-    if (vec3_length_sqr(&controller->player->velocity) < 0.01f)
+
+    if (vec3_length_sqr(&controller->player->velocity) < 0.01f * 0.01f)
     {
         controller->player->velocity.x = 0.0f;
         controller->player->velocity.y = 0.0f;

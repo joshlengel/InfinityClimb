@@ -131,6 +131,7 @@ Collision_Result collide_sphere_with_static(const Sphere *sphere, const Model *m
     result.displacement.z = 0.0f;
     result.res_velocity = player->velocity;
     result.collision_depth = 0.0f;
+    result.hit_ground = IC_FALSE;
 
     Mat4 transform = model_transform_matrix(model);
 
@@ -166,6 +167,7 @@ Collision_Result collide_sphere_with_static(const Sphere *sphere, const Model *m
         if (res_tri.collision_depth > result.collision_depth)
         {
             result = res_tri;
+            result.hit_ground = result.displacement.y > 0;
         }
     }
 
@@ -180,6 +182,7 @@ Collision_Result collide_capsule_with_static(const Capsule *capsule, const Model
     result.displacement.z = 0.0f;
     result.res_velocity = player->velocity;
     result.collision_depth = 0.0f;
+    result.hit_ground = IC_FALSE;
 
     float rad_sqr = capsule->radius * capsule->radius;
 
@@ -286,6 +289,7 @@ Collision_Result collide_capsule_with_static(const Capsule *capsule, const Model
         if (res_tri.collision_depth > result.collision_depth)
         {
             result = res_tri;
+            result.hit_ground = (center.x == A.x && center.y == A.y && center.z == A.z);
         }
     }
 
