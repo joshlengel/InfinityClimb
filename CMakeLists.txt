@@ -50,6 +50,6 @@ include_directories("${IC_DEPS}/glad/include")
 include_directories("${IC_DEPS}/stb")
 
 # Build
-set(EXECUTABLE_OUTPUT_PATH "${IC_ROOT}/bin")
+set(EXECUTABLE_OUTPUT_PATH "${IC_ROOT}/bin/${CMAKE_BUILD_TYPE}")
 add_executable(InfinityClimb ${sources})
 target_link_libraries(InfinityClimb glfw glad)
