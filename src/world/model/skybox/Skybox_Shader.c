@@ -1,5 +1,5 @@
-#include"world/skybox/Skybox_Shader.h"
-#include"world/skybox/Skybox.h"
+#include"world/model/skybox/Skybox_Shader.h"
+#include"world/model/skybox/Skybox.h"
 #include"util/Utils.h"
 
 #include<stdlib.h>
@@ -25,7 +25,12 @@ IC_ERROR_CODE skybox_shader_create(Skybox_Shader *dest)
 
     ec = shader_create(&dest->shader);
 
-    if (ec != IC_NO_ERROR) return ec;
+    if (ec != IC_NO_ERROR)
+    {
+        string_destroy(&v_src);
+        string_destroy(&f_src);
+        return ec;
+    }
 
     // Delete allocated strings for shader source code
     string_destroy(&v_src);

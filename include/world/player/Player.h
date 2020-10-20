@@ -1,8 +1,8 @@
 #pragma once
 
 #include"window/Input.h"
-#include"world/Physics.h"
 #include"util/math/Vec.h"
+#include"Core.h"
 
 enum _Player_Type
 {
@@ -17,11 +17,9 @@ struct _Player
     Vec3 position;
     Vec3 velocity;
     Vec3 acceleration;
+    IC_BOOL hit_ground;
 
-    Vec3 accum_velocity;
-    Vec3 accum_acceleration;
-
-    AABB aabb;
+    //AABB aabb;
 
     float mass;
 

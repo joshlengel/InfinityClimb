@@ -6,37 +6,23 @@
 
 void player_move_forward(Player *player, float speed)
 {
-    player->accum_velocity.x += sinf(player->yaw) * speed;
-    player->accum_velocity.z += cosf(player->yaw) * speed;
+    player->velocity.x += sinf(player->yaw) * speed;
+    player->velocity.z += cosf(player->yaw) * speed;
 }
 
 void player_move_right(Player *player, float speed)
 {
-    player->accum_velocity.x += cosf(player->yaw) * speed;
-    player->accum_velocity.z -= sinf(player->yaw) * speed;
+    player->velocity.x += cosf(player->yaw) * speed;
+    player->velocity.z -= sinf(player->yaw) * speed;
 }
 
 void player_move_up(Player *player, float speed)
 {
-    if (player->type == IC_PLAYER_SUPER)
-    {
-        player->accum_velocity.y += speed;
-    }
-    else
-    {
-        player->velocity.y += speed;
-    }
+    player->velocity.y += speed;
 }
 
 void player_controller_update(const Player_Controller *controller, const Input *input, float dt)
 {
-    controller->player->accum_velocity.x = 0;
-    controller->player->accum_velocity.y = 0;
-    controller->player->accum_velocity.z = 0;
-    controller->player->accum_acceleration.x = 0;
-    controller->player->accum_acceleration.y = 0;
-    controller->player->accum_acceleration.z = 0;
-
     if (input_key_down(input, controller->forward_key))
     {
         player_move_forward(controller->player, controller->xz_speed);
@@ -82,13 +68,37 @@ void player_controller_update(const Player_Controller *controller, const Input *
 
     if (controller->player->type == IC_PLAYER_NORMAL)
     {
-        controller->player->accum_acceleration.y -= 9.81f; // Gravity
+        controller->player->acceleration.y = -20.0f; // Gravity
     }
 
     // Euler integration
     Vec3 d_vel = vec3_scale(&controller->player->acceleration, dt);
-    Vec3 d_accum_vel = vec3_scale(&controller->player->accum_acceleration, dt);
-    d_vel = vec3_add(&d_vel, &d_accum_vel);
-
     controller->player->velocity = vec3_add(&controller->player->velocity, &d_vel);
+
+    Vec3 d_pos = vec3_scale(&controller->player->velocity, dt);
+    controller->player->position = vec3_add(&controller->player->position, &d_pos);
+
+    if (controller->player->type == IC_PLAYER_NORMAL)
+    {
+        if (controller->player->hit_ground)
+        {
+            controller->player->velocity = vec3_scale(&controller->player->velocity, 0.9f); // High drag
+        }
+        else
+        {
+            controller->player->velocity.x = controller->player->velocity.x * 0.92f; // Low drag
+            controller->player->velocity.z = controller->player->velocity.z * 0.92f; // Low drag
+        }
+    }
+    else
+    {
+        controller->player->velocity = vec3_scale(&controller->player->velocity, 0.8f); // High drag
+    }
+
+    if (vec3_length_sqr(&controller->player->velocity) < 0.01f * 0.01f)
+    {
+        controller->player->velocity.x = 0.0f;
+        controller->player->velocity.y = 0.0f;
+        controller->player->velocity.z = 0.0f;
+    }
 }

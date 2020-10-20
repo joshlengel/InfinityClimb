@@ -49,6 +49,11 @@ void context_update(const Context *context)
         else
             glCullFace(GL_BACK);
     }
+    else
+    {
+        glDisable(GL_CULL_FACE);
+    }
+    
 }
 
 void context_clear(const Context *context)

@@ -28,6 +28,19 @@ void vector_add(Vector *vector, const void *elem)
     memcpy(vector->arr + vector->elem_size * vector->size++, elem, vector->elem_size);
 }
 
+void *vector_add_r(Vector *vector, const void *elem)
+{
+    if (vector->size == vector->capacity)
+    {
+        vector->arr = realloc(vector->arr, vector->elem_size * (vector->capacity *= 2)); // double capacity
+    }
+
+    void *dest = vector->arr + vector->elem_size * vector->size++;
+
+    memcpy(dest, elem, vector->elem_size);
+    return dest;
+}
+
 void vector_put(Vector *vector, const void *elem, uint32_t index)
 {
     assert(index <= vector->size);

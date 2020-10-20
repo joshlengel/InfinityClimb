@@ -1,4 +1,4 @@
-#include"world/skybox/Skybox.h"
+#include"world/model/skybox/Skybox.h"
 #include"util/Utils.h"
 
 #include<glad/glad.h>
@@ -54,10 +54,10 @@ IC_ERROR_CODE skybox_create(Skybox *dest)
         5, 4, 6,
         5, 6, 7,
 
-        5, 1, 2,
-        5, 2, 6,
+        4, 0, 2,
+        4, 2, 6,
 
-        1, 4, 7,
+        1, 5, 7,
         1, 7, 3,
 
         4, 5, 1,
@@ -119,5 +119,6 @@ void skybox_render(const Skybox *skybox)
 {
     glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->data->tex_id);
 
+    glBindVertexArray(skybox->data->vao_id);
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, NULL);
 }

@@ -23,16 +23,15 @@ set(sources
     "window/Window.c"
     "window/Input.c"
     "window/Context.c"
-    "world/Shader.c"
     "world/Camera.c"
-    "world/Physics.c"
-    "world/rect/Rect.c"
-    "world/rect/Rect_Shader.c"
+    "world/model/Shader.c"
+    "world/model/Model.c"
+    "world/model/mesh/Mesh.c"
+    "world/model/mesh/Mesh_Shader.c"
+    "world/model/physics/Collidable.c"
+    "world/model/skybox/Skybox.c"
+    "world/model/skybox/Skybox_Shader.c"
     "world/player/Player.c"
-    "world/skybox/Skybox.c"
-    "world/skybox/Skybox_Shader.c"
-    "world/level/Level.c"
-    "world/level/Level_Parser.c"
 )
 
 list(TRANSFORM sources PREPEND "${IC_ROOT}/src/")
@@ -51,6 +50,6 @@ include_directories("${IC_DEPS}/glad/include")
 include_directories("${IC_DEPS}/stb")
 
 # Build
-set(EXECUTABLE_OUTPUT_PATH "${IC_ROOT}/bin")
+set(EXECUTABLE_OUTPUT_PATH "${IC_ROOT}/bin/${CMAKE_BUILD_TYPE}")
 add_executable(InfinityClimb ${sources})
 target_link_libraries(InfinityClimb glfw glad)

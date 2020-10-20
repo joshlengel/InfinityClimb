@@ -1,6 +1,6 @@
 #pragma once
 
-#include"world/Shader.h"
+#include"world/model/Shader.h"
 #include"util/math/Mat.h"
 #include"Core.h"
 
