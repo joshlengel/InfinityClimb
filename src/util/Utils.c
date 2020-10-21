@@ -21,8 +21,7 @@ String read_source(const char *path, IC_ERROR_CODE *error_code)
     res.c_str = NULL;
     res.length = 0;
 
-    FILE *file;
-    fopen_s(&file, path, "rb");
+    FILE *file = fopen(path, "rb");
 
     if (!file)
     {
@@ -59,7 +58,7 @@ String read_source(const char *path, IC_ERROR_CODE *error_code)
 
     res.c_str = malloc(sizeof(char) * ((size_t)size + 1));
     
-    if (!fread_s(res.c_str, size, sizeof(char), size, file))
+    if (!fread(res.c_str, sizeof(char), size, file))
     {
         log_trace("Error reading source file contents at '%s'.", path);
         fclose(file);

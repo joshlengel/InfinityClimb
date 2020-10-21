@@ -1,3 +1,5 @@
+#define _CRT_SECURE_NO_DEPRECATE
+
 #include"util/Utils.h"
 #include"util/Color.h"
 #include"util/math/Mat.h"
@@ -113,8 +115,7 @@ int main(int argc, char **argv)
 {
     if (init() != 0)
     {
-        FILE *init_log;
-        fopen_s(&init_log, "../../logs/init_log.txt", "w");
+        FILE *init_log = fopen("../../logs/init_log.txt", "w");
         if (!init_log)
         {
             dump_log(init_log);
