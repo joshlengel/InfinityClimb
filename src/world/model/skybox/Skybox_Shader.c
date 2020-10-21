@@ -8,10 +8,10 @@ IC_ERROR_CODE skybox_shader_create(Skybox_Shader *dest)
 {
     IC_ERROR_CODE ec;
 
-    String v_src = read_source("../assets/shaders/skybox.vert", &ec);
+    String v_src = read_source("../../assets/shaders/skybox.vert", &ec);
     if (ec != IC_NO_ERROR) return ec;
 
-    String f_src = read_source("../assets/shaders/skybox.frag", &ec);
+    String f_src = read_source("../../assets/shaders/skybox.frag", &ec);
     if (ec != IC_NO_ERROR)
     {
         string_destroy(&v_src);

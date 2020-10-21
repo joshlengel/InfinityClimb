@@ -2,6 +2,7 @@
 
 #include"window/Input.h"
 #include"util/math/Vec.h"
+#include"world/model/physics/Collidable.h"
 #include"Core.h"
 
 enum _Player_Type
@@ -19,20 +20,29 @@ struct _Player
     Vec3 acceleration;
     IC_BOOL hit_ground;
 
-    //AABB aabb;
-
-    float mass;
-
     float pitch, yaw;
 
     Player_Type type;
+
+    void *collidable;
+    Collidable collidable_type;
+    Vec3 collidable_offset;
+
+    Vec3 cam_offset;
 };
 
 typedef struct _Player Player;
 
+typedef struct _Camera Camera;
+
+IC_ERROR_CODE player_create(Player *dest);
+void player_destroy(const Player *player);
 void player_move_forward(Player *player, float speed);
 void player_move_right(Player *player, float speed);
 void player_move_up(Player *player, float speed);
+void player_update_camera(Player *player, Camera *camera);
+
+Player player_load_from_file(const char *path);
 
 struct _Player_Controller
 {

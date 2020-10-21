@@ -8,13 +8,13 @@ IC_ERROR_CODE mesh_shader_create(Mesh_Shader *dest)
 {
     IC_ERROR_CODE ec;
 
-    String v_src = read_source("../assets/shaders/mesh.vert", &ec);
+    String v_src = read_source("../../assets/shaders/mesh.vert", &ec);
     if (ec != IC_NO_ERROR)
     {
         return ec;
     }
 
-    String f_src = read_source("../assets/shaders/mesh.frag", &ec);
+    String f_src = read_source("../../assets/shaders/mesh.frag", &ec);
     if (ec != IC_NO_ERROR)
     {
         string_destroy(&v_src);

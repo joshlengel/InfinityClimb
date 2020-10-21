@@ -134,6 +134,7 @@ Collision_Result collide_sphere_with_static(const Sphere *sphere, const Model *m
     result.hit_ground = IC_FALSE;
 
     Mat4 transform = model_transform_matrix(model);
+    Vec3 position = vec3_add(&player->position, &player->collidable_offset);
 
     float rad_sqr = sphere->radius * sphere->radius;
 
@@ -163,7 +164,7 @@ Collision_Result collide_sphere_with_static(const Sphere *sphere, const Model *m
         Vec3 N = vec3_cross(&edge1, &edge2);
         N = vec3_normalize(&N);
 
-        Collision_Result res_tri = __collide_sphere_with_triangle_impl(sphere, player->position, player, p0, p1, p2, rad_sqr, N);
+        Collision_Result res_tri = __collide_sphere_with_triangle_impl(sphere, position, player, p0, p1, p2, rad_sqr, N);
         if (res_tri.collision_depth > result.collision_depth)
         {
             result = res_tri;
@@ -187,11 +188,12 @@ Collision_Result collide_capsule_with_static(const Capsule *capsule, const Model
     float rad_sqr = capsule->radius * capsule->radius;
 
     Mat4 transform = model_transform_matrix(model);
+    Vec3 position = vec3_add(&player->position, &player->collidable_offset);
 
     Vec3 cap_norm = { 0.0f, 1.0f, 0.0f };
-    Vec3 A = player->position;
+    Vec3 A = position;
     A.y -= capsule->body_height / 2;
-    Vec3 B = player->position;
+    Vec3 B = position;
     B.y += capsule->body_height / 2;
 
     Vec3 base = A;

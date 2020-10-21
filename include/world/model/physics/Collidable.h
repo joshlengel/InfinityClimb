@@ -21,7 +21,7 @@ struct _Capsule
 
 enum _Collidable
 {
-    IC_COLLIDABLE_AABB,
+    IC_COLLIDABLE_SPHERE,
     IC_COLLIDABLE_CAPSULE
 };
 
