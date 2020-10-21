@@ -1,3 +1,7 @@
+#define _CRT_SECURE_NO_WARNINGS
+#pragma warning(push)
+#pragma warning(disable: 26451)
+
 #include"Log.h"
 
 #include<stdio.h>
@@ -130,3 +134,5 @@ void dump_log(FILE *file)
 {
     fputs(log_str, file);
 }
+
+#pragma warning(pop)

@@ -1,3 +1,6 @@
+#pragma warning(push)
+#pragma warning(disable: 26451)
+
 #include"util/Vector.h"
 
 #include<stdlib.h>
@@ -57,3 +60,5 @@ void *vector_get(const Vector *vector, uint32_t index)
 
     return (int8_t*)vector->arr + (size_t)vector->elem_size * (size_t)index;
 }
+
+#pragma warning(pop)

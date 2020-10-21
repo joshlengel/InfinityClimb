@@ -1,3 +1,7 @@
+#define _CRT_SECURE_NO_WARNINGS
+#pragma warning(push)
+#pragma warning(disable: 26451)
+
 #include"util/Utils.h"
 #include"Log.h"
 
@@ -238,3 +242,5 @@ float timer_get_dt(const Timer *timer)
 {
     return timer->_diff;
 }
+
+#pragma warning(pop)
