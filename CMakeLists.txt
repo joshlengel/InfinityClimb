@@ -24,6 +24,7 @@ set(sources
     "window/Input.c"
     "window/Context.c"
     "world/Camera.c"
+    "world/Level.c"
     "world/model/Shader.c"
     "world/model/Model.c"
     "world/model/mesh/Mesh.c"

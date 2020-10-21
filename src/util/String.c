@@ -13,9 +13,41 @@ void string_create(String *dest, const char *str)
     memcpy(dest->c_str, str, dest->length + 1); // can use +1 here because strlen requires string to be null-terminated, so we copy this character as well
 }
 
+void string_create_sv(String *dest, const String_View *str)
+{
+    dest->length = str->length;
+    dest->c_str = malloc(sizeof(char) * (dest->length + 1));
+    memcpy(dest->c_str, str->c_str, dest->length);
+    dest->c_str[dest->length] = '\0';
+}
+
 void string_destroy(const String *string)
 {
     free((void*)string->c_str);
+}
+
+String string_concat_s(const String *str1, const String *str2)
+{
+    String res;
+    res.length = str1->length + str2->length;
+    res.c_str = malloc(sizeof(char) * (res.length + 1));
+    memcpy(res.c_str, str1->c_str, str1->length);
+    memcpy(res.c_str + str1->length, str2->c_str, str2->length);
+    res.c_str[res.length] = '\0';
+
+    return res;
+}
+
+String string_concat_sv(const String_View *str1, const String_View *str2)
+{
+    String res;
+    res.length = str1->length + str2->length;
+    res.c_str = malloc(sizeof(char) * (res.length + 1));
+    memcpy(res.c_str, str1->c_str, str1->length);
+    memcpy(res.c_str + str1->length, str2->c_str, str2->length);
+    res.c_str[res.length] = '\0';
+
+    return res;
 }
 
 void string_view_create_s(String_View *dest, const String *string, uint32_t from_index, uint32_t to_index)

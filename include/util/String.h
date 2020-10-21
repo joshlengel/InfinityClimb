@@ -20,7 +20,11 @@ typedef struct _String String;
 typedef struct _String_View String_View;
 
 void string_create(String *dest, const char *str);
+void string_create_sv(String *dest, const String_View *str);
 void string_destroy(const String *string);
+
+String string_concat_s(const String *str1, const String *str2);
+String string_concat_sv(const String_View *str1, const String_View *str2);
 
 void string_view_create_s(String_View *dest, const String *string, uint32_t from_index, uint32_t to_index);
 void string_view_create_c_str(String_View *dest, const char *str, uint32_t from_index, uint32_t to_index);

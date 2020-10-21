@@ -19,17 +19,3 @@ void model_render(const Model *model)
 {
     mesh_render(model->mesh);
 }
-
-void model_update(Model *model, float dt)
-{
-    Vec3 sum_acceleration = vec3_add(&model->acceleration, &model->temp_acceleration);
-    Vec3 d_vel = vec3_scale(&sum_acceleration, dt);
-    model->velocity = vec3_add(&model->velocity, &d_vel);
-
-    Vec3 sum_velocity = vec3_add(&model->velocity, &model->temp_velocity);
-    Vec3 d_pos = vec3_scale(&sum_velocity, dt);
-    model->position = vec3_add(&model->position, &d_pos);
-
-    model->temp_acceleration = ZERO;
-    model->temp_velocity = ZERO;
-}
