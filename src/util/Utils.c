@@ -21,7 +21,8 @@ String read_source(const char *path, IC_ERROR_CODE *error_code)
     res.c_str = NULL;
     res.length = 0;
 
-    FILE *file = fopen(path, "rb");
+    FILE *file;
+    fopen_s(&file, path, "rb");
 
     if (!file)
     {
@@ -56,9 +57,9 @@ String read_source(const char *path, IC_ERROR_CODE *error_code)
         return res;
     }
 
-    res.c_str = malloc(sizeof(char) * (size + 1));
+    res.c_str = malloc(sizeof(char) * ((size_t)size + 1));
     
-    if (!fread(res.c_str, sizeof(char), size, file))
+    if (!fread_s(res.c_str, size, sizeof(char), size, file))
     {
         log_trace("Error reading source file contents at '%s'.", path);
         fclose(file);
@@ -203,6 +204,13 @@ uint64_t __timer_get_time_impl()
     gettimeofday(&now, NULL);
 
     return (uint64_t)now.tv_sec * (uint64_t)1000000000L + (uint64_t)now.tv_usec * (uint64_t)1000L;
+#elif defined(IC_WINDOWS)
+    LARGE_INTEGER freq;
+    QueryPerformanceFrequency(&freq);
+
+    LARGE_INTEGER now;
+    QueryPerformanceCounter(&now);
+    return (uint64_t)now.QuadPart * (uint64_t)1000000000L / (uint64_t)freq.QuadPart;
 #endif // IC_LINUX
     // TODO: Add more platforms
 }

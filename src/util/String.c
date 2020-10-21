@@ -9,14 +9,14 @@
 void string_create(String *dest, const char *str)
 {
     dest->length = (uint32_t)strlen(str);
-    dest->c_str = malloc(sizeof(char) * (dest->length + 1));
-    memcpy(dest->c_str, str, dest->length + 1); // can use +1 here because strlen requires string to be null-terminated, so we copy this character as well
+    dest->c_str = malloc(sizeof(char) * ((size_t)dest->length + 1));
+    memcpy(dest->c_str, str, (size_t)dest->length + 1); // can use +1 here because strlen requires string to be null-terminated, so we copy this character as well
 }
 
 void string_create_sv(String *dest, const String_View *str)
 {
     dest->length = str->length;
-    dest->c_str = malloc(sizeof(char) * (dest->length + 1));
+    dest->c_str = malloc(sizeof(char) * ((size_t)dest->length + 1));
     memcpy(dest->c_str, str->c_str, dest->length);
     dest->c_str[dest->length] = '\0';
 }
@@ -30,7 +30,7 @@ String string_concat_s(const String *str1, const String *str2)
 {
     String res;
     res.length = str1->length + str2->length;
-    res.c_str = malloc(sizeof(char) * (res.length + 1));
+    res.c_str = malloc(sizeof(char) * ((size_t)res.length + 1));
     memcpy(res.c_str, str1->c_str, str1->length);
     memcpy(res.c_str + str1->length, str2->c_str, str2->length);
     res.c_str[res.length] = '\0';
@@ -42,7 +42,7 @@ String string_concat_sv(const String_View *str1, const String_View *str2)
 {
     String res;
     res.length = str1->length + str2->length;
-    res.c_str = malloc(sizeof(char) * (res.length + 1));
+    res.c_str = malloc(sizeof(char) * ((size_t)res.length + 1));
     memcpy(res.c_str, str1->c_str, str1->length);
     memcpy(res.c_str + str1->length, str2->c_str, str2->length);
     res.c_str[res.length] = '\0';
@@ -62,7 +62,7 @@ void string_view_create_s(String_View *dest, const String *string, uint32_t from
 
 void string_view_create_c_str(String_View *dest, const char *str, uint32_t from_index, uint32_t to_index)
 {
-    uint32_t length = strlen(str);
+    uint32_t length = (uint32_t)strlen(str);
     assert(from_index < length && to_index >= from_index);
 
     if (to_index > length) to_index = length;
@@ -148,7 +148,7 @@ String_View string_view_trim(const String_View *string)
     }
 
     String_View res;
-    string_view_create_c_str(&res, start, (start - string->c_str) / sizeof(char), index);
+    string_view_create_c_str(&res, start, (uint32_t)((start - string->c_str) / sizeof(char)), index);
     return res;
 }
 
@@ -171,7 +171,7 @@ IC_BOOL string_equals(const String *str1, const String *str2)
 
 IC_BOOL string_equals_c_str(const String *str1, const char *str2)
 {
-    uint32_t str2_length = strlen(str2);
+    uint32_t str2_length = (uint32_t)strlen(str2);
     if (str1->length != str2_length) return IC_FALSE;
 
     const char *itr1 = str1->c_str;
@@ -206,7 +206,7 @@ IC_BOOL string_view_equals(const String_View *str1, const String_View *str2)
 
 IC_BOOL string_view_equals_c_str(const String_View *str1, const char *str2)
 {
-    uint32_t str2_length = strlen(str2);
+    uint32_t str2_length = (uint32_t)strlen(str2);
     if (str1->length != str2_length) return IC_FALSE;
 
     const char *itr1 = str1->c_str;

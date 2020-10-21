@@ -63,7 +63,7 @@ void __log_impl(const char *fmt, va_list args)
     
     int written = vsnprintf(log_str + log_index, rem_size, fmt, args);
 
-    while (written >= rem_size)
+    while (written >= (signed)rem_size)
     {
         resize_log();
         rem_size = log_size - log_index;
@@ -85,7 +85,8 @@ void log_trace(const char *fmt, ...)
 {
     // Get time and log it
     time_t t = time(NULL);
-    struct tm local_time = *localtime(&t);
+    struct tm local_time;
+    localtime_s(&local_time, &t);
     const char *prefix_fmt = "[%02d %s %d - %02d:%02d:%02d] ";
     
     __log_vargs_impl(prefix_fmt, local_time.tm_mday, months[local_time.tm_mon], local_time.tm_year + 1900, local_time.tm_hour, local_time.tm_min, local_time.tm_sec);

@@ -73,7 +73,7 @@ IC_ERROR_CODE mesh_create(Mesh *dest)
     free(arr);
 
     GLuint index = 0;
-    void *pointer = (void*)0;
+    int8_t *pointer = (int8_t*)0;
 
     if (dest->vertices)
     {
@@ -122,7 +122,7 @@ void mesh_render(const Mesh *mesh)
 
 Mesh mesh_load_from_obj(const char *path)
 {
-    Mesh res;
+    Mesh res = {0};
 
     IC_ERROR_CODE ec;
     String source_str = read_source(path, &ec);

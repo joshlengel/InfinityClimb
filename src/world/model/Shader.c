@@ -151,6 +151,7 @@ GLint __get_uniform_location_impl(const Shader *shader, const char *name)
     }
 
     assert(0);
+    return -1;
 }
 
 void shader_set_uniform_1i(const Shader *shader, const char *name, int32_t v)
