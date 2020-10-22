@@ -4,17 +4,14 @@
 
 #include"Log.h"
 
+#include"util/Vector.h"
+
 #include<stdio.h>
 #include<stdarg.h>
-#include<stdlib.h>
 #include<string.h>
 #include<time.h>
-#include<assert.h>
 
-static char *log_str;
-static uint32_t log_size, log_index;
-
-const uint32_t LOG_RESIZE = 1000;
+static Vector log_str = {.elem_size=sizeof(char)};
 
 const char *months[] =
 {
@@ -32,49 +29,32 @@ const char *months[] =
     "Dec"
 };
 
+const char NULL_TERMINATOR = '\0';
+const char NEWLINE = '\n';
+
 void log_init()
 {
-    assert(LOG_RESIZE > 1);
-
-    log_str = malloc(sizeof(char) * LOG_RESIZE);
-    log_str[0] = '\0';
-    log_size = LOG_RESIZE;
-    log_index = 0;
+    vector_create(&log_str, 1000);
+    vector_add(&log_str, &NULL_TERMINATOR);
 }
 
 void log_terminate()
 {
-    free(log_str);
-    log_size = 0;
-    log_index = 0;
-}
-
-void resize_log()
-{
-    char *temp = log_str;
-    log_str = realloc(log_str, sizeof(char) * (log_size += LOG_RESIZE));
-
-    if (!log_str)
-    {
-        free(temp);
-        return;
-    }
+    vector_destroy(&log_str);
 }
 
 void __log_impl(const char *fmt, va_list args)
 {
-    uint32_t rem_size = log_size - log_index;
+    uint32_t rem_size = log_str.capacity - log_str.size + 1;
     
-    int written = vsnprintf(log_str + log_index, rem_size, fmt, args);
+    int written = vsnprintf((char*)log_str.arr + log_str.size - 1, rem_size, fmt, args);
 
     while (written >= (signed)rem_size)
     {
-        resize_log();
-        rem_size = log_size - log_index;
-        written = vsnprintf(log_str + log_index, rem_size, fmt, args);
+        vector_add(&log_str, &NULL_TERMINATOR); // This will be overwritten anyway
+        rem_size = log_str.capacity - log_str.size + 1;
+        written = vsnprintf((char*)log_str.arr + log_str.size, rem_size, fmt, args);
     }
-
-    log_index += written;
 }
 
 void __log_vargs_impl(const char *fmt, ...)
@@ -99,40 +79,36 @@ void log_trace(const char *fmt, ...)
 
     __log_impl(fmt, args);
 
-    if ((int32_t)log_index >= (int32_t)log_size - 1)
-    {
-        resize_log();
-    }
-
-    log_str[log_index++] = '\n';
-    log_str[log_index] = '\0';
+    vector_add(&log_str, &NEWLINE);
+    vector_add(&log_str, &NULL_TERMINATOR);
 }
 
 uint32_t get_log_size()
 {
-    return log_index;
+    return log_str.size - 1;
 }
 
 void get_log(char *dest, uint32_t size)
 {
-    if (size < log_index)
+    if (size < log_str.size)
     {
-        memcpy(dest, log_str, size);
+        memcpy(dest, log_str.arr, size);
     }
     else
     {
-        memcpy(dest, log_str, log_index);
+        memcpy(dest, log_str.arr, log_str.size);
     }
 }
 
 void flush_log()
 {
-    log_index = 0;
+    log_str.size = 1;
+    vector_put(&log_str, &NULL_TERMINATOR, 0);
 }
 
 void dump_log(FILE *file)
 {
-    fputs(log_str, file);
+    fputs((char*)log_str.arr, file);
 }
 
 #pragma warning(pop)

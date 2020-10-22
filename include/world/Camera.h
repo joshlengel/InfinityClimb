@@ -1,6 +1,5 @@
 #pragma once
 
-#include"window/Input.h"
 #include"util/math/Vec.h"
 #include"util/math/Mat.h"
 

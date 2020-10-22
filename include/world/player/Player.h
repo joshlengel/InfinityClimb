@@ -1,8 +1,9 @@
 #pragma once
 
+#include"world/model/physics/Collidable.h"
+
 #include"window/Input.h"
 #include"util/math/Vec.h"
-#include"world/model/physics/Collidable.h"
 #include"Core.h"
 
 enum _Player_Type
@@ -64,6 +65,6 @@ struct _Player_Controller
 
 typedef struct _Player_Controller Player_Controller;
 
-typedef struct _Timer Timer;
+typedef struct _Input Input;
 
 void player_controller_update(const Player_Controller *controller, const Input *input, float dt);

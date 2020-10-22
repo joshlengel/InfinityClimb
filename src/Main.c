@@ -1,16 +1,15 @@
 #define _CRT_SECURE_NO_WARNINGS
 
-#include"util/Utils.h"
-#include"util/Color.h"
-#include"util/math/Mat.h"
 #include"window/Window.h"
 #include"window/Input.h"
 #include"state/State.h"
 #include"state/Start_State.h"
+#include"util/Utils.h"
 #include"Libs.h"
 #include"Log.h"
 #include"Core.h"
 
+#include<stdio.h>
 #include<stdlib.h>
 
 Window window;

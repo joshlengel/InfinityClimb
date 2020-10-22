@@ -2,8 +2,6 @@
 
 #include"world/model/mesh/Mesh.h"
 
-const Vec3 ZERO = { 0.0f, 0.0f, 0.0f };
-
 Mat4 model_transform_matrix(const Model *model)
 {
     Mat4 scale = mat4_make_scale(model->scale.x, model->scale.y, model->scale.z);

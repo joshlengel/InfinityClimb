@@ -1,7 +1,6 @@
 #pragma once
 
 #include"world/model/Shader.h"
-#include"util/math/Mat.h"
 #include"Core.h"
 
 struct _Skybox_Shader
@@ -12,6 +11,7 @@ struct _Skybox_Shader
 typedef struct _Skybox_Shader Skybox_Shader;
 
 typedef struct _Skybox Skybox;
+typedef struct _Mat4 Mat4;
 
 IC_ERROR_CODE skybox_shader_create(Skybox_Shader *dest);
 void skybox_shader_destroy(const Skybox_Shader *shader);

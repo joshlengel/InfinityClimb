@@ -1,6 +1,4 @@
 #include"world/Camera.h"
-#include"window/Input.h"
-#include"util/Utils.h"
 
 #include<math.h>
 

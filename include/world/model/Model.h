@@ -3,7 +3,6 @@
 #include"util/Color.h"
 #include"util/math/Vec.h"
 #include"util/math/Mat.h"
-#include"world/model/physics/Collidable.h"
 
 typedef struct _Mesh Mesh;
 

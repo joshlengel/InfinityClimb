@@ -36,6 +36,7 @@ struct _Level
 };
 
 typedef struct _Level Level;
+typedef struct _Window Window;
 typedef struct _Camera Camera;
 
 IC_ERROR_CODE level_create(Level *level);
