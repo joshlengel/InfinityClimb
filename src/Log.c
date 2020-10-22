@@ -49,12 +49,17 @@ void __log_impl(const char *fmt, va_list args)
     
     int written = vsnprintf((char*)log_str.arr + log_str.size - 1, rem_size, fmt, args);
 
+    uint32_t size = log_str.size + written;
+        
     while (written >= (signed)rem_size)
     {
         vector_add(&log_str, &NULL_TERMINATOR); // This will be overwritten anyway
         rem_size = log_str.capacity - log_str.size + 1;
         written = vsnprintf((char*)log_str.arr + log_str.size, rem_size, fmt, args);
+        size = log_str.size + written;
     }
+
+    log_str.size = size;
 }
 
 void __log_vargs_impl(const char *fmt, ...)
@@ -78,6 +83,8 @@ void log_trace(const char *fmt, ...)
     va_start(args, fmt);
 
     __log_impl(fmt, args);
+
+    log_str.size -= 1;
 
     vector_add(&log_str, &NEWLINE);
     vector_add(&log_str, &NULL_TERMINATOR);

@@ -52,21 +52,13 @@ IC_ERROR_CODE init()
 
 int main(int argc, char **argv)
 {
-    if (init() != IC_NO_ERROR)
+    init();
+
+    FILE *init_log = fopen("../../logs/init_log.txt", "w");
+    if (init_log)
     {
-        FILE *init_log = fopen("../../logs/init_log.txt", "w");
-        if (!init_log)
-        {
-            dump_log(init_log);
-            fclose(init_log);
-        }
-        loader_unload(&window_loader);
-        terminate_libs();
-        return -1;
-    }
-    else
-    {
-        remove("../../logs/init_log.txt");
+        dump_log(init_log);
+        fclose(init_log);
     }
 
     State *start_state = malloc(sizeof(State));
@@ -95,6 +87,13 @@ int main(int argc, char **argv)
         state_machine_render(&state_machine);
 
         window_swap_buffers(&window);
+    }
+
+    FILE *game_log = fopen("../../logs/game_log.txt", "w");
+    if (game_log)
+    {
+        dump_log(game_log);
+        fclose(game_log);
     }
 
     loader_unload(&window_loader);

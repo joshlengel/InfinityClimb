@@ -45,4 +45,4 @@ void level_destroy(const Level *level);
 void level_update(Level *level, Camera *camera, float dt);
 void level_render(const Level *level, const Window *window, const Camera *camera);
 
-Level level_load_from_file(const char *path);
+Level level_load_from_file(const char *path, IC_ERROR_CODE *error_code);
