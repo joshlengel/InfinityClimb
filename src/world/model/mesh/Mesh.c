@@ -249,7 +249,7 @@ Mesh mesh_load_from_obj(const char *path, IC_ERROR_CODE *error_code)
             free(parts);
             break;
         }
-        else
+        else if (!string_view_equals_c_str(&parts[0], "#") && !string_view_equals_c_str(&parts[0], "o"))
         {
             log_trace("Warning on line %u at '%s': Unrecognized identifier '%.*s' for object", l + 1, path, parts[0].length, parts[0].c_str);
         }
