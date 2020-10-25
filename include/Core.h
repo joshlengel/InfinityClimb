@@ -1,5 +1,6 @@
 #pragma once
 
+// Operating system defines
 #ifdef _WIN32
     #define IC_WINDOWS
 #endif // _WIN32
@@ -17,6 +18,9 @@
     #error Platform unsupported
 #endif // OS
 
+#define IC_DEBUG_BREAK() asm("int $3")
+
+// Build type defines
 #ifndef NDEBUG
     #define IC_DEBUG
 #else
@@ -43,3 +47,15 @@ typedef int IC_ERROR_CODE;
 #define IC_READ_FILE_SIZE_ERROR 7
 #define IC_READ_ERROR 8
 #define IC_READ_CLOSE_FILE_ERROR 9
+
+#define IC_LEVEL_SYNTAX_ERROR 10
+#define IC_LEVEL_WHITESPACE_INEFFICIENCY 11
+#define IC_LEVEL_INCOMPLETE_ERROR 12
+
+#define IC_PLAYER_SYNTAX_ERROR 13
+#define IC_PLAYER_WHITESPACE_INEFFICIENCY 14
+#define IC_PLAYER_INCOMPLETE_ERROR 15
+
+#define IC_SKYBOX_TEXTURE_LOAD_ERROR 16
+
+#define IC_OUT_OF_MEMORY_ERROR 17

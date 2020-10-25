@@ -23,7 +23,8 @@ IC_ERROR_CODE init()
     IC_ERROR_CODE ec;
 
     // Load libraries
-    if ((ec = load_libs()) != IC_NO_ERROR)
+    ec = load_libs();
+    if (ec != IC_NO_ERROR)
     {
         log_trace("Error loading libs. Error code: %i", ec);
         return ec;
@@ -52,24 +53,17 @@ IC_ERROR_CODE init()
 
 int main(int argc, char **argv)
 {
-    if (init() != IC_NO_ERROR)
+    init();
+
+    FILE *init_log = fopen("../../logs/init_log.txt", "w");
+    if (init_log)
     {
-        FILE *init_log = fopen("../../logs/init_log.txt", "w");
-        if (!init_log)
-        {
-            dump_log(init_log);
-            fclose(init_log);
-        }
-        loader_unload(&window_loader);
-        terminate_libs();
-        return -1;
-    }
-    else
-    {
-        remove("../../logs/init_log.txt");
+        dump_log(init_log);
+        fclose(init_log);
     }
 
     State *start_state = malloc(sizeof(State));
+    log_assert(start_state != NULL, "Error starting InfinityClimb. Out of memory");
     start_state->exit = IC_FALSE;
     start_state->start_proc = start_state_start;
     start_state->stop_proc = start_state_stop;
@@ -95,6 +89,13 @@ int main(int argc, char **argv)
         state_machine_render(&state_machine);
 
         window_swap_buffers(&window);
+    }
+
+    FILE *game_log = fopen("../../logs/game_log.txt", "w");
+    if (game_log)
+    {
+        dump_log(game_log);
+        fclose(game_log);
     }
 
     loader_unload(&window_loader);

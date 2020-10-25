@@ -15,6 +15,8 @@
 
 struct _Game_State_Data
 {
+    IC_BOOL loaded;
+
     Loader loader;
     Context context;
 
@@ -40,6 +42,8 @@ void game_state_start(State *state)
     Game_State_Data *data = malloc(sizeof(Game_State_Data));
     state->data = data;
 
+    data->loaded = IC_FALSE;
+
     // Context
     data->sky_color = color_create_hex(0x87CEEBFF);
     
@@ -50,7 +54,15 @@ void game_state_start(State *state)
     data->context.cull_front = IC_FALSE;
 
     // Level
-    data->level = level_load_from_file("../../assets/components/level1.iclevel");
+    IC_ERROR_CODE ec;
+    data->level = level_load_from_file("../../assets/components/level1.iclevel", &ec);
+    if (ec != IC_NO_ERROR)
+    {
+        state->exit = IC_TRUE;
+        state->next_state = NULL;
+        return;
+    }
+
     data->level.player.type = IC_PLAYER_NORMAL;
     data->level.mesh_shader = &data->mesh_shader;
     data->level.skybox_shader = &data->skybox_shader;
@@ -79,9 +91,12 @@ void game_state_start(State *state)
     loader_add_resource(&data->loader, &data->level,         (Loader_Init_proc)level_create,            (Loader_Dest_proc)level_destroy);
     loader_load(&data->loader);
 
+    data->loaded = IC_TRUE;
+
     if (loader_error(&data->loader) != IC_NO_ERROR)
     {
         state->exit = IC_TRUE;
+        state->next_state = NULL;
         return;
     }
 
@@ -95,9 +110,13 @@ void game_state_start(State *state)
 void game_state_stop(State *state)
 {
     Game_State_Data *data = (Game_State_Data*)state->data;
-
-    loader_unload(&data->loader);
-    loader_destroy(&data->loader);
+    
+    if (data->loaded)
+    {
+        loader_unload(&data->loader);
+        loader_destroy(&data->loader);
+    }
+    
     free(data);
 }
 

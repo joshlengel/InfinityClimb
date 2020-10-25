@@ -43,7 +43,7 @@ void player_move_right(Player *player, float speed);
 void player_move_up(Player *player, float speed);
 void player_update_camera(Player *player, Camera *camera);
 
-Player player_load_from_file(const char *path);
+Player player_load_from_file(const char *path, IC_ERROR_CODE *ec);
 
 struct _Player_Controller
 {

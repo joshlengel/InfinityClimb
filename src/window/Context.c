@@ -1,5 +1,6 @@
 #include"window/Context.h"
 #include"util/Color.h"
+#include"Log.h"
 
 #include<glad/glad.h>
 
@@ -14,6 +15,7 @@ IC_ERROR_CODE context_create(Context *dest)
 {
     Context_Data *data = malloc(sizeof(Context_Data));
     dest->data = data;
+    log_assert(data != NULL, "Error creating context. Out of memory");
 
     glEnable(GL_DEPTH_TEST);
 

@@ -1,10 +1,14 @@
 #include"state/State.h"
 
+#include"util/Utils.h"
+
 #include<stdlib.h>
 
 IC_BOOL __state_check_exit_impl(State_Machine *state_machine)
 {
     State *current = state_machine->current_state;
+
+    if (!current) return IC_TRUE;
 
     if (current->exit)
     {
@@ -18,7 +22,12 @@ IC_BOOL __state_check_exit_impl(State_Machine *state_machine)
             next->input = current->input;
             next->timer = current->timer;
             next->start_proc(next);
+
+            timer_start(current->timer);
+            
             state_machine->current_state = next;
+
+            if (next->exit) return IC_TRUE;
         }
         else
         {

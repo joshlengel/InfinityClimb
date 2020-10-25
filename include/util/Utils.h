@@ -50,3 +50,33 @@ void timer_destroy(const Timer *timer);
 void timer_start(Timer *timer);
 IC_BOOL timer_should_update(Timer *timer);
 float timer_get_dt(const Timer *timer);
+
+// Options
+typedef uint8_t IC_OPTIONS_8;
+typedef uint16_t IC_OPTIONS_16;
+typedef uint32_t IC_OPTIONS_32;
+typedef uint64_t IC_OPTIONS_64;
+
+#define IC_OPTION_SET(options, index) (options |= (1 << index))
+#define IC_OPTION_UNSET(options, index) (options &= ~(1 << index))
+#define IC_OPTION_IS_SET(options, index) ((options & 1 << index) > 0)
+
+#ifdef IC_DEBUG
+    #define IC_DEBUG_OPTIONS_8(name) IC_OPTIONS_8 name = 0;
+    #define IC_DEBUG_OPTIONS_16(name) IC_OPTIONS_16 name = 0;
+    #define IC_DEBUG_OPTIONS_32(name) IC_OPTIONS_32 name = 0;
+    #define IC_DEBUG_OPTIONS_64(name) IC_OPTIONS_64 name = 0;
+
+    #define IC_DEBUG_OPTION_SET(options, index) IC_OPTION_SET(options, index)
+    #define IC_DEBUG_OPTION_UNSET(options, index) IC_OPTION_UNSET(options, index)
+    #define IC_DEBUG_OPTION_IS_SET(options, index) IC_OPTION_IS_SET(options, index)
+#else
+    #define IC_DEBUG_OPTIONS_8(name)
+    #define IC_DEBUG_OPTIONS_16(name)
+    #define IC_DEBUG_OPTIONS_32(name)
+    #define IC_DEBUG_OPTIONS_64(name)
+
+    #define IC_DEBUG_OPTION_SET(options, index)
+    #define IC_DEBUG_OPTION_UNSET(options, index)
+    #define IC_DEBUG_OPTION_IS_SET(options, index)
+#endif // IC_DEBUG

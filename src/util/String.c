@@ -1,5 +1,6 @@
 #include"util/String.h"
 #include"util/Vector.h"
+#include"Core.h"
 
 #include<stdlib.h>
 #include<string.h>
@@ -72,9 +73,12 @@ void string_view_create_c_str(String_View *dest, const char *str, uint32_t from_
 
 String_View *string_view_split(const String_View *string, char delim, uint32_t *splits)
 {
-    Vector strings;
-    strings.elem_size = sizeof(String_View);
-    vector_create(&strings, 10);
+    Vector strings={.elem_size=sizeof(String_View), .init_capacity=10};
+    IC_ERROR_CODE ec = vector_create(&strings);
+    if (ec != IC_NO_ERROR)
+    {
+        return NULL;
+    }
 
     uint32_t index = 0;
     const char *str = string->c_str;
