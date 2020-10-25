@@ -98,12 +98,14 @@ struct _Loader_Data
 void loader_create(Loader *dest)
 {
     Loader_Data *data = malloc(sizeof(Loader_Data));
+    log_assert(data != NULL, "Error creating loader. Out of memory");
     data->num_resources = dest->num_resources * 3;
     data->index = 0;
     data->error_code = IC_NO_ERROR;
     dest->data = data;
 
     data->resources = malloc(sizeof(void*) * data->num_resources); // Each resource has two functions associated
+    log_assert(data->resources, "Error creating loader. Out of memory");
 }
 
 void loader_destroy(const Loader *loader)

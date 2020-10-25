@@ -23,7 +23,8 @@ IC_ERROR_CODE init()
     IC_ERROR_CODE ec;
 
     // Load libraries
-    if ((ec = load_libs()) != IC_NO_ERROR)
+    ec = load_libs();
+    if (ec != IC_NO_ERROR)
     {
         log_trace("Error loading libs. Error code: %i", ec);
         return ec;
@@ -62,6 +63,7 @@ int main(int argc, char **argv)
     }
 
     State *start_state = malloc(sizeof(State));
+    log_assert(start_state != NULL, "Error starting InfinityClimb. Out of memory");
     start_state->exit = IC_FALSE;
     start_state->start_proc = start_state_start;
     start_state->stop_proc = start_state_stop;

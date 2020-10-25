@@ -6,7 +6,7 @@
 #include<stdio.h>
 
 #ifdef IC_DEBUG
-    #define log_assert(expression, ...) if (!expression) { log_trace(__VA_ARGS__); asm("int $3"); }
+    #define log_assert(expression, ...) if (!(expression)) { log_trace(__VA_ARGS__); asm("int $3"); }
 #else
     #define log_assert(expression, ...)
 #endif // IC_DEBUG

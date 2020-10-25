@@ -72,19 +72,35 @@ Level level_load_from_file(const char *path, IC_ERROR_CODE *error_code)
     float player_start_pitch;
     float player_start_yaw;
 
-    String source_str = read_source(path, error_code);
-    if (*error_code != IC_NO_ERROR)
+    IC_ERROR_CODE ec;
+    String source_str = read_source(path, &ec);
+    if (ec != IC_NO_ERROR)
     {
+        if (error_code) *error_code = ec;
         return res;
     }
 
     String_View source;
     string_view_create_s(&source, &source_str, 0, UINT32_MAX);
 
-    Vector meshes = {.elem_size=sizeof(Mesh)};
-    Vector models = {.elem_size=sizeof(Model)};
-    vector_create(&meshes, 5);
-    vector_create(&models, 5);
+    Vector meshes = {.elem_size=sizeof(Mesh), .init_capacity=5};
+    Vector models = {.elem_size=sizeof(Model), .init_capacity=5};
+    ec = vector_create(&meshes);
+    if (ec != IC_NO_ERROR)
+    {
+        string_destroy(&source_str);
+        if (error_code) *error_code = ec;
+        return res;
+    }
+
+    ec = vector_create(&models);
+    if (ec != IC_NO_ERROR)
+    {
+        string_destroy(&source_str);
+        vector_destroy(&meshes);
+        if (error_code) *error_code = ec;
+        return res;
+    }
 
     uint32_t num_lines;
     String_View *lines = string_view_split(&source, '\n', &num_lines);
@@ -209,7 +225,13 @@ Level level_load_from_file(const char *path, IC_ERROR_CODE *error_code)
 
                     String path = string_concat_sv(&prefix, &arg_pair[1]);
 
-                    Mesh mesh = mesh_load_from_obj(path.c_str);
+                    Mesh mesh = mesh_load_from_obj(path.c_str, &ec);
+                    if (ec != IC_NO_ERROR)
+                    {
+                        free(arg_pair);
+                        continue;
+                    }
+
                     model.mesh = (Mesh*)vector_add_r(&meshes, &mesh);
 
                     string_destroy(&path);

@@ -1,5 +1,6 @@
 #include"window/Window.h"
 #include"window/Window_Mmt.h"
+#include"Log.h"
 
 #define GLFW_INCLUDE_NONE
 #include<GLFW/glfw3.h>
@@ -16,12 +17,14 @@ IC_ERROR_CODE window_create(Window *dest)
 {
     Window_Data *data = malloc(sizeof(Window_Data));
     dest->data = data;
+    log_assert(data != NULL, "Error creating window. Out of memory");
 
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
     data->handle = glfwCreateWindow((int)dest->width, (int)dest->height, dest->title, NULL, NULL);
 
     if (!data->handle)
     {
+        free(data);
         return IC_WINDOW_CREATE_ERROR;
     }
 

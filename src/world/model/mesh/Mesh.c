@@ -4,6 +4,7 @@
 #include"util/String.h"
 #include"util/Vector.h"
 #include"util/Utils.h"
+#include"Log.h"
 
 #include<glad/glad.h>
 
@@ -22,6 +23,8 @@ IC_ERROR_CODE mesh_create(Mesh *dest)
 {
     Mesh_Data *data = malloc(sizeof(Mesh_Data));
     dest->data = data;
+    log_assert(data != NULL, "Error creating mesh. Out of memory");
+
     data->num_indices = dest->num_indices;
 
     glGenVertexArrays(1, &data->vao_id);
@@ -38,6 +41,13 @@ IC_ERROR_CODE mesh_create(Mesh *dest)
     GLsizei stride = num_elems * sizeof(float);
     uint32_t arr_size = dest->num_vertices * stride;
     float *arr = malloc(arr_size);
+    if (arr == NULL)
+    {
+        log_trace("Error creating mesh. Out of memory");
+        mesh_destroy(dest);
+        return IC_OUT_OF_MEMORY_ERROR;
+    }
+
     float *itr = arr;
 
     const float *v_itr = dest->vertices;
@@ -120,14 +130,17 @@ void mesh_render(const Mesh *mesh)
     glDrawElements(GL_TRIANGLES, (GLsizei)mesh->data->num_indices, GL_UNSIGNED_INT, NULL);
 }
 
-Mesh mesh_load_from_obj(const char *path)
+Mesh mesh_load_from_obj(const char *path, IC_ERROR_CODE *error_code)
 {
     Mesh res = {0};
+
+    if (error_code) *error_code = IC_NO_ERROR;
 
     IC_ERROR_CODE ec;
     String source_str = read_source(path, &ec);
     if (ec != IC_NO_ERROR)
     {
+        if (error_code) *error_code = ec;
         return res;
     }
 
@@ -147,13 +160,36 @@ Mesh mesh_load_from_obj(const char *path)
         Vertex *duplicate;
     };
 
-    Vector vertices = { .elem_size=sizeof(Vertex) };
-    Vector texture_coords = { .elem_size=sizeof(Vec2) };
-    Vector normals = { .elem_size=sizeof(Vec3) };
+    Vector vertices = { .elem_size=sizeof(Vertex), .init_capacity=50 };
+    Vector texture_coords = { .elem_size=sizeof(Vec2), .init_capacity=50 };
+    Vector normals = { .elem_size=sizeof(Vec3), .init_capacity=50 };
 
-    vector_create(&vertices, 50);
-    vector_create(&texture_coords, 50);
-    vector_create(&normals, 50);
+    ec = vector_create(&vertices);
+    if (ec != IC_NO_ERROR)
+    {
+        string_destroy(&source_str);
+        if (error_code) *error_code = ec;
+        return res;
+    }
+
+    ec = vector_create(&texture_coords);
+    if (ec != IC_NO_ERROR)
+    {
+        string_destroy(&source_str);
+        vector_destroy(&vertices);
+        if (error_code) *error_code = ec;
+        return res;
+    }
+
+    ec = vector_create(&normals);
+    if (ec != IC_NO_ERROR)
+    {
+        string_destroy(&source_str);
+        vector_destroy(&vertices);
+        vector_destroy(&texture_coords);
+        if (error_code) *error_code = ec;
+        return res;
+    }
 
     IC_BOOL use_texture_coords = IC_FALSE;
     IC_BOOL use_normals = IC_FALSE;
@@ -213,12 +249,26 @@ Mesh mesh_load_from_obj(const char *path)
             free(parts);
             break;
         }
+        else
+        {
+            log_trace("Warning on line %u at '%s': Unrecognized identifier '%.*s' for object", l + 1, path, parts[0].length, parts[0].c_str);
+        }
 
         free(parts);
     }
 
-    Vector indices = { .elem_size=sizeof(uint32_t) };
-    vector_create(&indices, 50);
+    Vector indices = { .elem_size=sizeof(uint32_t), .init_capacity=50 };
+    ec = vector_create(&indices);
+    if (ec != IC_NO_ERROR)
+    {
+        string_destroy(&source_str);
+        vector_destroy(&vertices);
+        vector_destroy(&texture_coords);
+        vector_destroy(&normals);
+        free(lines);
+        if (error_code) *error_code = ec;
+        return res;
+    }
 
     for (; l < num_lines; ++l)
     {
@@ -299,6 +349,10 @@ Mesh mesh_load_from_obj(const char *path)
                 free(index_parts);
             }
         }
+        else
+        {
+            log_trace("Warning on line %u at '%s': Unrecognized identifier '%.*s' for object", l + 1, path, parts[0].length, parts[0].c_str);
+        }
 
         free(parts);
     }
@@ -311,15 +365,18 @@ Mesh mesh_load_from_obj(const char *path)
     float *normals_arr = NULL;
 
     vertices_arr = malloc(sizeof(float) * vertices.size * 3);
+    log_assert(vertices_arr != NULL, "Error creating mesh. Out of memory");
     
     if (use_texture_coords)
     {
         texture_coords_arr = malloc(sizeof(float) * vertices.size * 2);
+        log_assert(texture_coords_arr != NULL, "Error creating mesh. Out of memory");
     }
 
     if (use_normals)
     {
         normals_arr = malloc(sizeof(float) * vertices.size * 3);
+        log_assert(normals_arr != NULL, "Error creating mesh. Out of memory");
     }
 
     float *v_itr = vertices_arr;

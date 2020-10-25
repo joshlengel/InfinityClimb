@@ -30,6 +30,7 @@ struct _Shader_Data
 IC_ERROR_CODE shader_create(Shader *dest)
 {
     Shader_Data *data = malloc(sizeof(Shader_Data));
+    log_assert(data != NULL, "Error creating shader. Out of memory");
     dest->data = data;
 
     data->program_id = glCreateProgram();
@@ -37,6 +38,7 @@ IC_ERROR_CODE shader_create(Shader *dest)
     data->f_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
 
     data->uniform_locations = malloc(sizeof(Uniform_Location_Pair) * dest->num_uniforms);
+    log_assert(data != NULL, "Error creating shader. Out of memory");
     data->uniform_index = 0;
     data->num_uniforms = dest->num_uniforms; // In case user changes this number
 

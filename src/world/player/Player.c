@@ -126,6 +126,7 @@ Player player_load_from_file(const char *path, IC_ERROR_CODE *error_code)
                 IC_DEBUG_OPTIONS_32(options);
 
                 Sphere *sphere = malloc(sizeof(Sphere));
+                log_assert(sphere != NULL, "Error creating player. Out of memory");
                 
                 for (uint32_t i = 2; i < num_parts; ++i)
                 {
@@ -181,6 +182,7 @@ Player player_load_from_file(const char *path, IC_ERROR_CODE *error_code)
                 IC_DEBUG_OPTIONS_32(options)
 
                 Capsule *capsule = malloc(sizeof(Capsule));
+                log_assert(capsule != NULL, "Error creating player. Out of memory");
                 
                 for (uint32_t i = 2; i < num_parts; ++i)
                 {

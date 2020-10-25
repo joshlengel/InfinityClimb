@@ -1,5 +1,7 @@
 #include"world/model/skybox/Skybox.h"
 
+#include"Log.h"
+
 #include<glad/glad.h>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -18,6 +20,7 @@ struct _Skybox_Data
 IC_ERROR_CODE skybox_create(Skybox *dest)
 {
     Skybox_Data *data = malloc(sizeof(Skybox_Data));
+    log_assert(data != NULL, "Error creating skybox. Out of memory");
     dest->data = data;
 
     glGenVertexArrays(1, &data->vao_id);
@@ -87,6 +90,12 @@ IC_ERROR_CODE skybox_create(Skybox *dest)
 
         // Get pixels from texture file
         unsigned char *pixels = stbi_load(tex_sources[i], &width, &height, &comp, STBI_rgb_alpha);
+        if (pixels == NULL)
+        {
+            log_trace("Error creating skybox. Loading texture at '%s' unsuccessful", tex_sources[i]);
+            skybox_destroy(dest);
+            return IC_SKYBOX_TEXTURE_LOAD_ERROR;
+        }
 
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 

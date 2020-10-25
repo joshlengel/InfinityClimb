@@ -11,7 +11,7 @@
 #include<string.h>
 #include<time.h>
 
-static Vector log_str = {.elem_size=sizeof(char)};
+static Vector log_str = {.elem_size=sizeof(char), .init_capacity=1000};
 
 const char *months[] =
 {
@@ -32,9 +32,14 @@ const char *months[] =
 const char NULL_TERMINATOR = '\0';
 const char NEWLINE = '\n';
 
-void log_init()
+IC_ERROR_CODE log_init()
 {
-    vector_create(&log_str, 1000);
+    IC_ERROR_CODE ec = vector_create(&log_str);
+    if (ec != IC_NO_ERROR)
+    {
+        return ec;
+    }
+
     vector_add(&log_str, &NULL_TERMINATOR);
 }
 

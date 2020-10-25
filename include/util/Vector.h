@@ -1,5 +1,7 @@
 #pragma once
 
+#include"Core.h"
+
 #include<stdint.h>
 
 struct _Vector
@@ -7,11 +9,12 @@ struct _Vector
     void *arr;
     uint32_t elem_size;
     uint32_t size, capacity;
+    uint32_t init_capacity;
 };
 
 typedef struct _Vector Vector;
 
-void vector_create(Vector *dest, uint32_t initial_capacity);
+IC_ERROR_CODE vector_create(Vector *dest);
 void vector_destroy(const Vector *vector);
 
 void vector_add(Vector *vector, const void *elem);
