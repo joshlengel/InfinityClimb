@@ -12,7 +12,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 
-const char *PREFIX = "../../";
+const char *PREFIX = "../../../";
 
 Window window;
 Input input;
