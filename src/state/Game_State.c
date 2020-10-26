@@ -64,6 +64,8 @@ void game_state_start(State *state)
     }
 
     data->level.player.type = IC_PLAYER_NORMAL;
+    data->level.player.perspective = IC_PLAYER_THIRD_PERSON;
+    data->level.player.cam_dist = 2.0f;
     data->level.mesh_shader = &data->mesh_shader;
     data->level.skybox_shader = &data->skybox_shader;
 
@@ -128,6 +130,31 @@ void game_state_update(State *state)
     if (input_key_pressed(state->input, IC_KEY_ESCAPE))
     {
         input_toggle_cursor(state->input);
+    }
+
+    // Check for player mode and perspective changes
+    if (input_key_pressed(state->input, IC_KEY_M))
+    {
+        if (data->level.player.type == IC_PLAYER_NORMAL)
+        {
+            data->level.player.type = IC_PLAYER_SUPER;
+        }
+        else
+        {
+            data->level.player.type = IC_PLAYER_NORMAL;
+        }
+    }
+
+    if (input_key_pressed(state->input, IC_KEY_P))
+    {
+        if (data->level.player.perspective == IC_PLAYER_THIRD_PERSON)
+        {
+            data->level.player.perspective = IC_PLAYER_FIRST_PERSON;
+        }
+        else
+        {
+            data->level.player.perspective = IC_PLAYER_THIRD_PERSON;
+        }
     }
 
     if (!input_cursor_enabled(state->input))

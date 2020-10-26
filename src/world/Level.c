@@ -546,7 +546,7 @@ void level_render(const Level *level, const Window *window, const Camera *camera
     }
 
     Mat4 player_transform = player_transform_matrix(&level->player);
-    Color player_color = color_create_hex(0x777777FF);
+    Color player_color = color_create_hex(0x999999FF);
     mesh_shader_set_transform(level->mesh_shader, &player_transform);
     mesh_shader_set_color(level->mesh_shader, &player_color);
     mesh_render(&level->player.mesh);    

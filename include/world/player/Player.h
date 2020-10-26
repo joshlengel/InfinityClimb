@@ -14,7 +14,14 @@ enum _Player_Type
     IC_PLAYER_NORMAL
 };
 
+enum _Player_Perspective
+{
+    IC_PLAYER_FIRST_PERSON,
+    IC_PLAYER_THIRD_PERSON
+};
+
 typedef enum _Player_Type Player_Type;
+typedef enum _Player_Perspective Player_Perspective;
 
 struct _Player
 {
@@ -35,7 +42,10 @@ struct _Player
     Vec3 mesh_offset;
 
     Vec3 cam_offset;
-    float cam_yaw;
+    float cam_dist; // Only for third person
+    float cam_pitch, cam_yaw;
+
+    Player_Perspective perspective;
 };
 
 typedef struct _Player Player;

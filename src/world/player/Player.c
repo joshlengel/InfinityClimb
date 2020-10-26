@@ -385,19 +385,33 @@ Player player_load_from_file(const char *path, IC_ERROR_CODE *error_code)
 
 void player_update_camera(Player *player, Camera *camera)
 {
-    Vec3 pitch_axis = { -1.0f, 0.0f, 0.0f };
-    Vec3 yaw_axis = { 0.0f, 1.0f, 0.0f };
-    Mat4 rot_pitch = mat4_make_axis_angle(&pitch_axis, player->pitch);
-    Mat4 rot_yaw = mat4_make_axis_angle(&yaw_axis, player->cam_yaw);
+    switch(player->perspective)
+    {
+    case IC_PLAYER_FIRST_PERSON:
+        camera->position = vec3_add(&player->position, &player->cam_offset);
+        camera->pitch = player->cam_pitch;
+        camera->yaw = player->cam_yaw;
+        break;
 
-    Vec4 cam_pos_4d = { player->cam_offset.x, player->cam_offset.y, player->cam_offset.z, 1.0f };
-    cam_pos_4d = mat4_transform(&rot_pitch, &cam_pos_4d);
-    cam_pos_4d = mat4_transform(&rot_yaw, &cam_pos_4d);
-    Vec3 cam_off = { cam_pos_4d.x, cam_pos_4d.y, cam_pos_4d.z };
+    case IC_PLAYER_THIRD_PERSON:
+    {
+        Vec3 pitch_axis = { -1.0f, 0.0f, 0.0f };
+        Vec3 yaw_axis = { 0.0f, 1.0f, 0.0f };
+        Mat4 rot_pitch = mat4_make_axis_angle(&pitch_axis, player->cam_pitch);
+        Mat4 rot_yaw = mat4_make_axis_angle(&yaw_axis, player->cam_yaw);
 
-    camera->position = vec3_add(&player->position, &cam_off);
-    camera->pitch = player->pitch;
-    camera->yaw = player->cam_yaw;
+        Vec4 cam_pos_4d = { 0.0f, 0.0f, -player->cam_dist, 1.0f };
+        cam_pos_4d = mat4_transform(&rot_pitch, &cam_pos_4d);
+        cam_pos_4d = mat4_transform(&rot_yaw, &cam_pos_4d);
+        Vec3 cam_off = { cam_pos_4d.x, cam_pos_4d.y, cam_pos_4d.z };
+        cam_off = vec3_add(&player->cam_offset, &cam_off);
+
+        camera->position = vec3_add(&player->position, &cam_off);
+        camera->pitch = player->cam_pitch;
+        camera->yaw = player->cam_yaw;
+        break;
+    }
+    }
 }
 
 void player_destroy(const Player *player)
@@ -448,13 +462,30 @@ void player_controller_update(const Player_Controller *controller, const Input *
         }
     }
 
-    controller->player->yaw = atan2f(controller->player->velocity.x, controller->player->velocity.z);
+    switch (controller->player->perspective)
+    {
+    case IC_PLAYER_FIRST_PERSON:
+        controller->player->yaw = controller->player->cam_yaw;
+        controller->player->pitch = 0;
+        break;
+
+    case IC_PLAYER_THIRD_PERSON:
+        if (vec3_length_sqr(&controller->player->velocity) > 0.01f * 0.01f)
+            controller->player->yaw = atan2f(controller->player->velocity.x, controller->player->velocity.z);
+        
+        controller->player->pitch = 0;
+        break;
+    }
     controller->player->cam_yaw += input_cursor_dx(input) * controller->mouse_sensitivity;
-    controller->player->pitch += input_cursor_dy(input) * controller->mouse_sensitivity;
+    controller->player->cam_pitch += input_cursor_dy(input) * controller->mouse_sensitivity;
 
     if (controller->player->type == IC_PLAYER_NORMAL)
     {
         controller->player->acceleration.y = -17.0f; // Gravity
+    }
+    else
+    {
+        controller->player->acceleration.y = 0.0f;
     }
 
     // Euler integration
@@ -491,11 +522,14 @@ void player_controller_update(const Player_Controller *controller, const Input *
 
 Mat4 player_transform_matrix(const Player *player)
 {
-    Vec3 yaw_axis = { 0.0f, -1.0f, 0.0f };
+    Vec3 pitch_axis = { -1.0f, 0.0f, 0.0f };
+    Vec3 yaw_axis = { 0.0f, 1.0f, 0.0f };
+    Mat4 rot_pitch = mat4_make_axis_angle(&pitch_axis, player->pitch);
     Mat4 rot_yaw = mat4_make_axis_angle(&yaw_axis, player->yaw + IC_PI);
 
     Mat4 translate = mat4_make_translate(player->position.x + player->mesh_offset.x, player->position.y + player->mesh_offset.y, player->position.z + player->mesh_offset.z);
 
-    Mat4 res = mat4_mul(&translate, &rot_yaw);
+    Mat4 res = mat4_mul(&rot_pitch, &rot_yaw);
+    res = mat4_mul(&translate, &res);
     return res;
 }
