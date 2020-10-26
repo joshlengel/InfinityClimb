@@ -1,2 +1,3 @@
 collidable type=capsule radius=0.2 body_height=0.6 offset_x=0.0 offset_y=0.3 offset_z=0.0
-camera                                             offset_x=0.0 offset_y=0.4 offset_z=0.0
+camera                                             offset_x=0.0 offset_y=0.4 offset_z=-2.0
+mesh       path=assets/models/character.obj        offset_x=0.0 offset_y=0.2 offset_z=0.0

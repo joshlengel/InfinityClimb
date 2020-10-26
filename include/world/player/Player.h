@@ -1,9 +1,11 @@
 #pragma once
 
 #include"world/model/physics/Collidable.h"
+#include"world/model/mesh/Mesh.h"
 
 #include"window/Input.h"
 #include"util/math/Vec.h"
+#include"util/math/Mat.h"
 #include"Core.h"
 
 enum _Player_Type
@@ -29,7 +31,11 @@ struct _Player
     Collidable collidable_type;
     Vec3 collidable_offset;
 
+    Mesh mesh;
+    Vec3 mesh_offset;
+
     Vec3 cam_offset;
+    float cam_yaw;
 };
 
 typedef struct _Player Player;
@@ -44,6 +50,8 @@ void player_move_up(Player *player, float speed);
 void player_update_camera(Player *player, Camera *camera);
 
 Player player_load_from_file(const char *path, IC_ERROR_CODE *ec);
+
+Mat4 player_transform_matrix(const Player *player);
 
 struct _Player_Controller
 {

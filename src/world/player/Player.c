@@ -2,11 +2,14 @@
 
 #include"window/Input.h"
 #include"world/Camera.h"
+#include"world/model/mesh/Mesh.h"
 #include"util/Utils.h"
 #include"Log.h"
 
 #include<stdlib.h>
 #include<math.h>
+
+extern const char *PREFIX;
 
 #ifdef IC_DEBUG
 const char *SPHERE_OPTION_NAMES[4] =
@@ -24,9 +27,14 @@ const char *CAMERA_OPTION_NAMES[3] =
     "offset_x", "offset_y", "offset_z"
 };
 
-const char *PLAYER_IDENTIFIER_NAMES[2] =
+const char *MESH_OPTION_NAMES[4] =
 {
-    "collidable", "camera"
+    "path", "offset_x", "offset_y", "offset_z"
+};
+
+const char *PLAYER_IDENTIFIER_NAMES[3] =
+{
+    "collidable", "camera", "mesh"
 };
 
 void __player_check_required_options_impl(IC_OPTIONS_32 options, uint8_t num_options, const char *part_name, const char **option_names, uint32_t line, const char *path, IC_ERROR_CODE *error_code)
@@ -51,19 +59,19 @@ void __player_check_required_options_impl(IC_OPTIONS_32 options, uint8_t num_opt
 
 IC_ERROR_CODE player_create(Player *dest)
 {
-    return IC_NO_ERROR;
+    return mesh_create(&dest->mesh);
 }
 
 void player_move_forward(Player *player, float speed)
 {
-    player->velocity.x += sinf(player->yaw) * speed;
-    player->velocity.z += cosf(player->yaw) * speed;
+    player->velocity.x += sinf(player->cam_yaw) * speed;
+    player->velocity.z += cosf(player->cam_yaw) * speed;
 }
 
 void player_move_right(Player *player, float speed)
 {
-    player->velocity.x += cosf(player->yaw) * speed;
-    player->velocity.z -= sinf(player->yaw) * speed;
+    player->velocity.x += cosf(player->cam_yaw) * speed;
+    player->velocity.z -= sinf(player->cam_yaw) * speed;
 }
 
 void player_move_up(Player *player, float speed)
@@ -103,7 +111,7 @@ Player player_load_from_file(const char *path, IC_ERROR_CODE *error_code)
         if (num_parts == 0) // Not really an error
         {
             free(parts);
-            log_trace("Warning on line %u at '%s': Empty line with whitespace found. This is not critical, but leads to inefficiencies", l, path);
+            log_trace("Warning on line %u at '%s': Empty line with whitespace found. This is not critical, but leads to inefficiencies", l + 1, path);
             if (error_code) *error_code = IC_PLAYER_WHITESPACE_INEFFICIENCY;
             continue;
         }
@@ -113,7 +121,7 @@ Player player_load_from_file(const char *path, IC_ERROR_CODE *error_code)
             if (num_parts == 1)
             {
                 free(parts);
-                log_trace("Warning on line %u at '%s': Missing all options of collidable", l, path);
+                log_trace("Warning on line %u at '%s': Missing all options of collidable", l + 1, path);
                 if (error_code) *error_code = IC_PLAYER_INCOMPLETE_ERROR;
                 continue;
             }
@@ -135,7 +143,7 @@ Player player_load_from_file(const char *path, IC_ERROR_CODE *error_code)
 
                     if (num_arg_pair == 0) // Incorrect syntax
                     {
-                        log_trace("Warning on line %u at '%s': '%.*s' is incorrect syntax", l, path, parts[i].length, parts[i].c_str);
+                        log_trace("Warning on line %u at '%s': '%.*s' is incorrect syntax", l + 1, path, parts[i].length, parts[i].c_str);
                         free(arg_pair);
                         if (error_code) *error_code = IC_PLAYER_SYNTAX_ERROR;
                         continue;
@@ -163,14 +171,14 @@ Player player_load_from_file(const char *path, IC_ERROR_CODE *error_code)
                     }
                     else
                     {
-                        log_trace("Warning on line %u at '%s': Unrecognized option '%.*s'", l, path, arg_pair[0].length, arg_pair[0].c_str);
+                        log_trace("Warning on line %u at '%s': Unrecognized option '%.*s' for collidable sphere", l + 1, path, arg_pair[0].length, arg_pair[0].c_str);
                         if (error_code) *error_code = IC_PLAYER_SYNTAX_ERROR;
                     }
 
                     free(arg_pair);
                 }
 
-                __check_required_options(options, 4, "sphere", SPHERE_OPTION_NAMES, l, path, error_code);
+                __check_required_options(options, 4, "sphere", SPHERE_OPTION_NAMES, l + 1, path, error_code);
 
                 player.collidable = sphere;
                 player.collidable_type = IC_COLLIDABLE_SPHERE;
@@ -224,14 +232,14 @@ Player player_load_from_file(const char *path, IC_ERROR_CODE *error_code)
                     }
                     else
                     {
-                        log_trace("Warning on line %u at '%s': Unrecognized option '%.*s'", l, path, arg_pair[0].length, arg_pair[0].c_str);
+                        log_trace("Warning on line %u at '%s': Unrecognized option '%.*s' for collidable capsule", l + 1, path, arg_pair[0].length, arg_pair[0].c_str);
                         if (error_code) *error_code = IC_PLAYER_SYNTAX_ERROR;
                     }
 
                     free(arg_pair);
                 }
 
-                __check_required_options(options, 5, "capsule", CAPSULE_OPTION_NAMES, l, path, error_code);
+                __check_required_options(options, 5, "capsule", CAPSULE_OPTION_NAMES, l + 1, path, error_code);
 
                 player.collidable = capsule;
                 player.collidable_type = IC_COLLIDABLE_CAPSULE;
@@ -252,7 +260,7 @@ Player player_load_from_file(const char *path, IC_ERROR_CODE *error_code)
 
                 if (num_arg_pair == 0) // Incorrect syntax
                 {
-                    log_trace("Warning on line %u at '%s': '%.*s' is incorrect syntax", l, path, parts[i].length, parts[i].c_str);
+                    log_trace("Warning on line %u at '%s': '%.*s' is incorrect syntax", l + 1, path, parts[i].length, parts[i].c_str);
                     free(arg_pair);
                     if (error_code) *error_code = IC_PLAYER_SYNTAX_ERROR;
                     continue;
@@ -275,16 +283,84 @@ Player player_load_from_file(const char *path, IC_ERROR_CODE *error_code)
                 }
                 else
                 {
-                    log_trace("Warning on line %u at '%s': Unrecognized option '%.*s'", l, path, arg_pair[0].length, arg_pair[0].c_str);
+                    log_trace("Warning on line %u at '%s': Unrecognized option '%.*s' for camera", l + 1, path, arg_pair[0].length, arg_pair[0].c_str);
                     if (error_code) *error_code = IC_PLAYER_SYNTAX_ERROR;
                 }
 
                 free(arg_pair);
             }
 
-            __check_required_options(options, 3, "camera", CAMERA_OPTION_NAMES, l, path, error_code);
+            __check_required_options(options, 3, "camera", CAMERA_OPTION_NAMES, l + 1, path, error_code);
 
             IC_DEBUG_OPTION_SET(player_options, 1);
+        }
+        else if (string_view_equals_c_str(&parts[0], "mesh"))
+        {
+            IC_DEBUG_OPTIONS_32(options)
+
+            for (uint32_t i = 1; i < num_parts; ++i)
+            {
+                uint32_t num_arg_pair;
+                String_View *arg_pair = string_view_split(&parts[i], '=', &num_arg_pair);
+
+                if (num_arg_pair == 0) // Incorrect syntax
+                {
+                    log_trace("Warning on line %u at '%s': '%.*s' is incorrect syntax", l + 1, path, parts[i].length, parts[i].c_str);
+                    free(arg_pair);
+                    if (error_code) *error_code = IC_PLAYER_SYNTAX_ERROR;
+                    continue;
+                }
+
+                if (string_view_equals_c_str(&arg_pair[0], "path"))
+                {
+                    String_View prefix;
+                    string_view_create_c_str(&prefix, PREFIX, 0, UINT32_MAX);
+
+                    String path = string_concat_sv(&prefix, &arg_pair[1]);
+
+                    player.mesh = mesh_load_from_obj(path.c_str, &ec);
+                    if (ec != IC_NO_ERROR)
+                    {
+                        free(arg_pair);
+                        string_destroy(&path);
+                        continue;
+                    }
+
+                    string_destroy(&path);
+                    IC_DEBUG_OPTION_SET(options, 0);
+                }
+                else if (string_view_equals_c_str(&arg_pair[0], "offset_x"))
+                {
+                    player.mesh_offset.x = strtof(arg_pair[1].c_str, NULL);
+                    IC_DEBUG_OPTION_SET(options, 1);
+                }
+                else if (string_view_equals_c_str(&arg_pair[0], "offset_y"))
+                {
+                    player.mesh_offset.y = strtof(arg_pair[1].c_str, NULL);
+                    IC_DEBUG_OPTION_SET(options, 2);
+                }
+                else if (string_view_equals_c_str(&arg_pair[0], "offset_z"))
+                {
+                    player.mesh_offset.z = strtof(arg_pair[1].c_str, NULL);
+                    IC_DEBUG_OPTION_SET(options, 3);
+                }
+                else
+                {
+                    log_trace("Warning on line %u at '%s': Unrecognized option '%.*s' for mesh", l + 1, path, arg_pair[0].length, arg_pair[0].c_str);
+                    if (error_code) *error_code = IC_PLAYER_SYNTAX_ERROR;
+                }
+
+                free(arg_pair);
+            }
+
+            __check_required_options(options, 4, "mesh", MESH_OPTION_NAMES, l + 1, path, error_code);
+
+            IC_DEBUG_OPTION_SET(player_options, 2);
+        }
+        else
+        {
+            log_trace("Warning on line %u at '%s': Unrecognized identifier '%.*s'", l + 1, path, parts[0].length, parts[0].c_str);
+            if (error_code) *error_code = IC_PLAYER_SYNTAX_ERROR;
         }
 
         free(parts);
@@ -294,7 +370,7 @@ Player player_load_from_file(const char *path, IC_ERROR_CODE *error_code)
     string_destroy(&source_str);
 
 #ifdef IC_DEBUG
-    for (uint8_t i = 0; i < 2; ++i)
+    for (uint8_t i = 0; i < 3; ++i)
     {
         if (!IC_DEBUG_OPTION_IS_SET(player_options, i))
         {
@@ -309,14 +385,25 @@ Player player_load_from_file(const char *path, IC_ERROR_CODE *error_code)
 
 void player_update_camera(Player *player, Camera *camera)
 {
-    camera->position = vec3_add(&player->position, &player->cam_offset);
+    Vec3 pitch_axis = { -1.0f, 0.0f, 0.0f };
+    Vec3 yaw_axis = { 0.0f, 1.0f, 0.0f };
+    Mat4 rot_pitch = mat4_make_axis_angle(&pitch_axis, player->pitch);
+    Mat4 rot_yaw = mat4_make_axis_angle(&yaw_axis, player->cam_yaw);
+
+    Vec4 cam_pos_4d = { player->cam_offset.x, player->cam_offset.y, player->cam_offset.z, 1.0f };
+    cam_pos_4d = mat4_transform(&rot_pitch, &cam_pos_4d);
+    cam_pos_4d = mat4_transform(&rot_yaw, &cam_pos_4d);
+    Vec3 cam_off = { cam_pos_4d.x, cam_pos_4d.y, cam_pos_4d.z };
+
+    camera->position = vec3_add(&player->position, &cam_off);
     camera->pitch = player->pitch;
-    camera->yaw = player->yaw;
+    camera->yaw = player->cam_yaw;
 }
 
 void player_destroy(const Player *player)
 {
     free(player->collidable);
+    mesh_destroy(&player->mesh);
 }
 
 void player_controller_update(const Player_Controller *controller, const Input *input, float dt)
@@ -361,7 +448,8 @@ void player_controller_update(const Player_Controller *controller, const Input *
         }
     }
 
-    controller->player->yaw += input_cursor_dx(input) * controller->mouse_sensitivity;
+    controller->player->yaw = atan2f(controller->player->velocity.x, controller->player->velocity.z);
+    controller->player->cam_yaw += input_cursor_dx(input) * controller->mouse_sensitivity;
     controller->player->pitch += input_cursor_dy(input) * controller->mouse_sensitivity;
 
     if (controller->player->type == IC_PLAYER_NORMAL)
@@ -399,4 +487,15 @@ void player_controller_update(const Player_Controller *controller, const Input *
         controller->player->velocity.y = 0.0f;
         controller->player->velocity.z = 0.0f;
     }
+}
+
+Mat4 player_transform_matrix(const Player *player)
+{
+    Vec3 yaw_axis = { 0.0f, -1.0f, 0.0f };
+    Mat4 rot_yaw = mat4_make_axis_angle(&yaw_axis, player->yaw + IC_PI);
+
+    Mat4 translate = mat4_make_translate(player->position.x + player->mesh_offset.x, player->position.y + player->mesh_offset.y, player->position.z + player->mesh_offset.z);
+
+    Mat4 res = mat4_mul(&translate, &rot_yaw);
+    return res;
 }

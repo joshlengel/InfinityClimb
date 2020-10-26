@@ -15,7 +15,7 @@
 
 #include<stdlib.h>
 
-const char *PREFIX = "../../";
+extern const char *PREFIX;
 
 #ifdef IC_DEBUG
 const char *PLAYER_OPTION_NAMES[6] =
@@ -229,6 +229,7 @@ Level level_load_from_file(const char *path, IC_ERROR_CODE *error_code)
                     if (ec != IC_NO_ERROR)
                     {
                         free(arg_pair);
+                        string_destroy(&path);
                         continue;
                     }
 
@@ -543,4 +544,10 @@ void level_render(const Level *level, const Window *window, const Camera *camera
 
         ++itr;
     }
+
+    Mat4 player_transform = player_transform_matrix(&level->player);
+    Color player_color = color_create_hex(0x777777FF);
+    mesh_shader_set_transform(level->mesh_shader, &player_transform);
+    mesh_shader_set_color(level->mesh_shader, &player_color);
+    mesh_render(&level->player.mesh);    
 }
