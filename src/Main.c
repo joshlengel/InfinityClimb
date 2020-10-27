@@ -5,9 +5,11 @@
 #include"state/State.h"
 #include"state/Start_State.h"
 #include"util/Utils.h"
+#include"util/String.h"
 #include"Libs.h"
 #include"Log.h"
 #include"Core.h"
+#include"IC_Config.h"
 
 #include<stdio.h>
 #include<stdlib.h>
@@ -55,13 +57,26 @@ int main(int argc, char **argv)
 {
     init();
 
-    FILE *init_log = fopen("../../../logs/init_log.txt", "w");
+#ifdef IC_DEBUG
+    String_View work_dir;
+    string_view_create_c_str(&work_dir, IC_WORKING_DIRECTORY, 0, UINT32_MAX);
+#endif // IC_DEBUG
+
+#ifdef IC_DEBUG
+    String_View init_rel_path;
+    string_view_create_c_str(&init_rel_path, "logs/init_log.txt", 0, UINT32_MAX);
+
+    String init_path = string_concat_sv(&work_dir, &init_rel_path);
+    FILE *init_log = fopen(init_path.c_str, "w");
+    string_destroy(&init_path);
+
     if (init_log)
     {
         dump_log(init_log);
         flush_log();
         fclose(init_log);
     }
+#endif // IC_DEBUG
 
     State *start_state = malloc(sizeof(State));
     log_assert(start_state != NULL, "Error starting InfinityClimb. Out of memory");
@@ -92,12 +107,21 @@ int main(int argc, char **argv)
         window_swap_buffers(&window);
     }
 
-    FILE *game_log = fopen("../../../logs/game_log.txt", "w");
+#ifdef IC_DEBUG
+    String_View game_rel_path;
+    string_view_create_c_str(&game_rel_path, "logs/game_log.txt", 0, UINT32_MAX);
+
+    String game_path = string_concat_sv(&work_dir, &game_rel_path);
+    FILE *game_log = fopen(game_path.c_str, "w");
+    string_destroy(&game_path);
+    
     if (game_log)
     {
         dump_log(game_log);
+        flush_log();
         fclose(game_log);
     }
+#endif // IC_DEBUG
 
     loader_unload(&window_loader);
     loader_destroy(&window_loader);
