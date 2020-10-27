@@ -1,15 +1,16 @@
 #include"util/String.h"
 #include"util/Vector.h"
 #include"Core.h"
+#include"Log.h"
 
 #include<stdlib.h>
 #include<string.h>
-#include<assert.h>
 
 void string_create(String *dest, const char *str)
 {
     dest->length = (uint32_t)strlen(str);
     dest->c_str = malloc(sizeof(char) * ((size_t)dest->length + 1));
+    log_assert(dest->c_str != NULL, "Error creating string. Out of memory");
     memcpy(dest->c_str, str, (size_t)dest->length + 1); // can use +1 here because strlen requires string to be null-terminated, so we copy this character as well
 }
 
@@ -17,6 +18,7 @@ void string_create_sv(String *dest, const String_View *str)
 {
     dest->length = str->length;
     dest->c_str = malloc(sizeof(char) * ((size_t)dest->length + 1));
+    log_assert(dest->c_str != NULL, "Error creating string. Out of memory");
     memcpy(dest->c_str, str->c_str, dest->length);
     dest->c_str[dest->length] = '\0';
 }
@@ -31,6 +33,7 @@ String string_concat_s(const String *str1, const String *str2)
     String res;
     res.length = str1->length + str2->length;
     res.c_str = malloc(sizeof(char) * ((size_t)res.length + 1));
+    log_assert(res.c_str != NULL, "Error concatenating strings. Out of memory");
     memcpy(res.c_str, str1->c_str, str1->length);
     memcpy(res.c_str + str1->length, str2->c_str, str2->length);
     res.c_str[res.length] = '\0';
@@ -43,6 +46,7 @@ String string_concat_sv(const String_View *str1, const String_View *str2)
     String res;
     res.length = str1->length + str2->length;
     res.c_str = malloc(sizeof(char) * ((size_t)res.length + 1));
+    log_assert(res.c_str != NULL, "Error concatenating strings. Out of memory");
     memcpy(res.c_str, str1->c_str, str1->length);
     memcpy(res.c_str + str1->length, str2->c_str, str2->length);
     res.c_str[res.length] = '\0';
@@ -52,7 +56,7 @@ String string_concat_sv(const String_View *str1, const String_View *str2)
 
 void string_view_create_s(String_View *dest, const String *string, uint32_t from_index, uint32_t to_index)
 {
-    assert(from_index < string->length && to_index >= from_index);
+    log_assert(from_index < string->length && to_index >= from_index, "Error creating string view. Index out of bounds");
 
     if (to_index > string->length) to_index = string->length;
 
@@ -63,7 +67,7 @@ void string_view_create_s(String_View *dest, const String *string, uint32_t from
 void string_view_create_c_str(String_View *dest, const char *str, uint32_t from_index, uint32_t to_index)
 {
     uint32_t length = (uint32_t)strlen(str);
-    assert(from_index < length && to_index >= from_index);
+    log_assert(from_index < length && to_index >= from_index, "Error creating string view. Index out of bounds");
 
     if (to_index > length) to_index = length;
 

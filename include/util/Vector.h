@@ -18,6 +18,8 @@ IC_ERROR_CODE vector_create(Vector *dest);
 void vector_destroy(const Vector *vector);
 
 void vector_add(Vector *vector, const void *elem);
+void vector_add_all(Vector *vector, const void *elems, uint32_t count);
 void *vector_add_r(Vector *vector, const void *elem);
+void *vector_add_r_all(Vector *vector, const void *elems, uint32_t count);
 void vector_put(Vector *vector, const void *elem, uint32_t index);
 void *vector_get(const Vector *vector, uint32_t index);

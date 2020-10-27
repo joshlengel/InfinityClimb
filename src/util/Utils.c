@@ -3,11 +3,11 @@
 #pragma warning(disable: 26451)
 
 #include"util/Utils.h"
+#include"util/Vector.h"
 #include"Log.h"
 
 #include<stdio.h>
 #include<stdlib.h>
-#include<assert.h>
 
 #ifdef IC_WINDOWS
     #include<Windows.h>
@@ -23,7 +23,7 @@ String read_source(const char *path, IC_ERROR_CODE *error_code)
     res.c_str = NULL;
     res.length = 0;
 
-    FILE *file = fopen(path, "rb");
+    FILE *file = fopen(path, "r");
 
     if (!file)
     {
@@ -32,47 +32,30 @@ String read_source(const char *path, IC_ERROR_CODE *error_code)
         return res;
     }
 
-    if (fseek(file, 0L, SEEK_END) != 0)
+    Vector chars={.elem_size=sizeof(char), .init_capacity=1000};
+    IC_ERROR_CODE ec = vector_create(&chars);
+    if (ec != IC_NO_ERROR)
     {
-        log_trace("Error reading source file size at '%s'. Make sure the source file is no larger than 4GB.", path);
         fclose(file);
-        if (error_code) *error_code = IC_READ_FILE_SIZE_ERROR;
+        if (error_code) *error_code = ec;
         return res;
     }
 
-    long size = ftell(file);
-
-    if (size < 0)
+    // This is slightly inefficient but the only fully-functional cross-platform solution
+    char buffer[1000];
+    while (fgets(buffer, 1000, file))
     {
-        log_trace("Error reading source file size at '%s'. Make sure the source file is no larger than 4GB.", path);
-        fclose(file);
-        if (error_code) *error_code = IC_READ_FILE_SIZE_ERROR;
-        return res;
+        uint32_t length = (uint32_t)strlen(buffer);
+        vector_add_all(&chars, buffer, length);
+        res.length += length;
     }
 
-    if (fseek(file, 0L, SEEK_SET) != 0)
-    {
-        log_trace("Error reading source file size at '%s'. Make sure the source file is no larger than 4GB.", path);
-        fclose(file);
-        if (error_code) *error_code = IC_READ_FILE_SIZE_ERROR;
-        return res;
-    }
+    char NULL_TERMINATOR = '\0';
+    vector_add(&chars, &NULL_TERMINATOR);
 
-    res.c_str = malloc(sizeof(char) * ((size_t)size + 1));
+    res.c_str = (char*)chars.arr;
+    log_assert(chars.arr != NULL, "Error reading source file at '%s'. Out of memory", path);
     
-    if (!fread(res.c_str, sizeof(char), size, file))
-    {
-        log_trace("Error reading source file contents at '%s'.", path);
-        fclose(file);
-        free(res.c_str);
-        res.c_str = NULL;
-        if (error_code) *error_code = IC_READ_ERROR;
-        return res;
-    }
-
-    res.length = size;
-    res.c_str[size] = '\0';
-
     if (fclose(file) != 0)
     {
         log_trace("Error closing source file at '%s'. Returning contents anyway.", path);
@@ -117,7 +100,7 @@ void loader_destroy(const Loader *loader)
 void loader_add_resource(const Loader *loader, void *resource, Loader_Init_proc initializer, Loader_Dest_proc destructor)
 {
     // Adding more resources than specified in loader_create
-    assert(loader->data->index < loader->data->num_resources);
+    log_assert(loader->data->index < loader->data->num_resources, "Error adding resource to loader. Resource limit reached. Create loader with higher capacity");
 
     void **itr = loader->data->resources + loader->data->index;
 

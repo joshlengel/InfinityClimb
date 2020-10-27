@@ -46,6 +46,30 @@ void vector_add(Vector *vector, const void *elem)
     memcpy((int8_t*)vector->arr + (size_t)vector->elem_size * (size_t)vector->size++, elem, vector->elem_size);
 }
 
+void vector_add_all(Vector *vector, const void *elems, uint32_t count)
+{
+    if (vector->size + count > vector->capacity)
+    {
+        do
+        {
+            vector->capacity *= 2;
+        }
+        while (vector->size + count > vector->capacity);
+
+        void *temp = vector->arr;
+        vector->arr = realloc(vector->arr, (size_t)vector->elem_size * (size_t)vector->capacity);
+
+        if (vector->arr == NULL)
+        {
+            free(temp);
+            log_assert(IC_FALSE, "Error adding elements to vector. Out of memory");
+        }
+    }
+
+    memcpy((int8_t*)vector->arr + (size_t)vector->elem_size * (size_t)vector->size, elems, (size_t)vector->elem_size * (size_t)count);
+    vector->size += count;
+}
+
 void *vector_add_r(Vector *vector, const void *elem)
 {
     if (vector->size == vector->capacity)
@@ -63,6 +87,33 @@ void *vector_add_r(Vector *vector, const void *elem)
     void *dest = (int8_t*)vector->arr + (size_t)vector->elem_size * (size_t)vector->size++;
 
     memcpy(dest, elem, vector->elem_size);
+    return dest;
+}
+
+void *vector_add_r_all(Vector *vector, const void *elems, uint32_t count)
+{
+    if (vector->size + count > vector->capacity)
+    {
+        do
+        {
+            vector->capacity *= 2;
+        }
+        while (vector->size + count > vector->capacity);
+
+        void *temp = vector->arr;
+        vector->arr = realloc(vector->arr, (size_t)vector->elem_size * (size_t)vector->capacity);
+
+        if (vector->arr == NULL)
+        {
+            free(temp);
+            log_assert(IC_FALSE, "Error adding elements to vector. Out of memory");
+        }
+    }
+
+    void *dest = (int8_t*)vector->arr + (size_t)vector->elem_size * (size_t)vector->size;
+    memcpy(dest, elems, (size_t)vector->elem_size * (size_t)count);
+    vector->size += count;
+
     return dest;
 }
 

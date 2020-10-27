@@ -57,10 +57,11 @@ int main(int argc, char **argv)
 {
     init();
 
-    FILE *init_log = fopen("../../logs/init_log.txt", "w");
+    FILE *init_log = fopen("../../../logs/init_log.txt", "w");
     if (init_log)
     {
         dump_log(init_log);
+        flush_log();
         fclose(init_log);
     }
 
@@ -93,7 +94,7 @@ int main(int argc, char **argv)
         window_swap_buffers(&window);
     }
 
-    FILE *game_log = fopen("../../logs/game_log.txt", "w");
+    FILE *game_log = fopen("../../../logs/game_log.txt", "w");
     if (game_log)
     {
         dump_log(game_log);

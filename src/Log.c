@@ -41,6 +41,8 @@ IC_ERROR_CODE log_init()
     }
 
     vector_add(&log_str, &NULL_TERMINATOR);
+
+    return IC_NO_ERROR;
 }
 
 void log_terminate()

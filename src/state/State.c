@@ -14,16 +14,16 @@ IC_BOOL __state_check_exit_impl(State_Machine *state_machine)
     {
         State *next = current->next_state;
         current->stop_proc(current);
-        free(current);
-
+        
         if (next)
         {
             next->window = current->window;
             next->input = current->input;
             next->timer = current->timer;
+            free(current);
             next->start_proc(next);
 
-            timer_start(current->timer);
+            timer_start(next->timer);
             
             state_machine->current_state = next;
 
@@ -31,6 +31,7 @@ IC_BOOL __state_check_exit_impl(State_Machine *state_machine)
         }
         else
         {
+            free(current);
             state_machine->current_state = NULL;
             return IC_TRUE;
         }

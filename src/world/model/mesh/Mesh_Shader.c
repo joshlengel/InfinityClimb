@@ -4,17 +4,29 @@
 #include"util/Color.h"
 #include"util/math/Mat.h"
 
+extern const char *PREFIX;
+const char *MESH_V_PATH = "assets/shaders/mesh.vert";
+const char *MESH_F_PATH = "assets/shaders/mesh.frag";
+
 IC_ERROR_CODE mesh_shader_create(Mesh_Shader *dest)
 {
     IC_ERROR_CODE ec;
 
-    String v_src = read_source("../../assets/shaders/mesh.vert", &ec);
-    if (ec != IC_NO_ERROR)
-    {
-        return ec;
-    }
+    String_View prefix;
+    String_View v_path_sv;
+    String_View f_path_sv;
+    string_view_create_c_str(&prefix, PREFIX, 0, UINT32_MAX);
+    string_view_create_c_str(&v_path_sv, MESH_V_PATH, 0, UINT32_MAX);
+    string_view_create_c_str(&f_path_sv, MESH_F_PATH, 0, UINT32_MAX);
 
-    String f_src = read_source("../../assets/shaders/mesh.frag", &ec);
+    String v_path = string_concat_sv(&prefix, &v_path_sv);
+    String v_src = read_source(v_path.c_str, &ec);
+    string_destroy(&v_path);
+    if (ec != IC_NO_ERROR) return ec;
+
+    String f_path = string_concat_sv(&prefix, &f_path_sv);
+    String f_src = read_source(f_path.c_str, &ec);
+    string_destroy(&f_path);
     if (ec != IC_NO_ERROR)
     {
         string_destroy(&v_src);

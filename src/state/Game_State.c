@@ -10,6 +10,7 @@
 #include"util/math/Vec.h"
 #include"util/Color.h"
 #include"util/Utils.h"
+#include"Log.h"
 
 #include<stdlib.h>
 
@@ -40,6 +41,7 @@ typedef struct _Game_State_Data Game_State_Data;
 void game_state_start(State *state)
 {
     Game_State_Data *data = malloc(sizeof(Game_State_Data));
+    log_assert(data != NULL, "Error creating data for game state. Out of memory");
     state->data = data;
 
     data->loaded = IC_FALSE;
@@ -55,7 +57,7 @@ void game_state_start(State *state)
 
     // Level
     IC_ERROR_CODE ec;
-    data->level = level_load_from_file("../../assets/components/level1.iclevel", &ec);
+    data->level = level_load_from_file("../../../assets/components/level1.iclevel", &ec);
     if (ec != IC_NO_ERROR)
     {
         state->exit = IC_TRUE;

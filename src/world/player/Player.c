@@ -525,7 +525,7 @@ Mat4 player_transform_matrix(const Player *player)
     Vec3 pitch_axis = { -1.0f, 0.0f, 0.0f };
     Vec3 yaw_axis = { 0.0f, 1.0f, 0.0f };
     Mat4 rot_pitch = mat4_make_axis_angle(&pitch_axis, player->pitch);
-    Mat4 rot_yaw = mat4_make_axis_angle(&yaw_axis, player->yaw + IC_PI);
+    Mat4 rot_yaw = mat4_make_axis_angle(&yaw_axis, player->yaw + (float)IC_PI);
 
     Mat4 translate = mat4_make_translate(player->position.x + player->mesh_offset.x, player->position.y + player->mesh_offset.y, player->position.z + player->mesh_offset.z);
 

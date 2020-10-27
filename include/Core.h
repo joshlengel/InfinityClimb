@@ -18,7 +18,11 @@
     #error Platform unsupported
 #endif // OS
 
-#define IC_DEBUG_BREAK() asm("int $3")
+#ifdef IC_LINUX
+    #define IC_DEBUG_BREAK() asm("int $3")
+#elif defined(IC_WINDOWS)
+    #define IC_DEBUG_BREAK() __debugbreak()
+#endif //OS
 
 // Build type defines
 #ifndef NDEBUG
