@@ -15,8 +15,6 @@
 
 #include<stdlib.h>
 
-extern const char *PREFIX;
-
 #ifdef IC_DEBUG
 const char *PLAYER_OPTION_NAMES[6] =
 {
@@ -142,10 +140,8 @@ Level level_load_from_file(const char *path, IC_ERROR_CODE *error_code)
 
                 if (string_view_equals_c_str(&arg_pair[0], "path"))
                 {
-                    String_View prefix;
-                    string_view_create_c_str(&prefix, PREFIX, 0, UINT32_MAX); // Executable is two layers deep
-
-                    String path = string_concat_sv(&prefix, &arg_pair[1]);
+                    String path;
+                    string_create_sv(&path, &arg_pair[1]);
 
                     res.player = player_load_from_file(path.c_str, error_code);
                     if (*error_code != IC_NO_ERROR)
@@ -220,10 +216,8 @@ Level level_load_from_file(const char *path, IC_ERROR_CODE *error_code)
 
                 if (string_view_equals_c_str(&arg_pair[0], "path"))
                 {
-                    String_View prefix;
-                    string_view_create_c_str(&prefix, PREFIX, 0, UINT32_MAX); // Executable is two layers deep
-
-                    String path = string_concat_sv(&prefix, &arg_pair[1]);
+                    String path;
+                    string_create_sv(&path, &arg_pair[1]);
 
                     Mesh mesh = mesh_load_from_obj(path.c_str, &ec);
                     if (ec != IC_NO_ERROR)
@@ -305,55 +299,49 @@ Level level_load_from_file(const char *path, IC_ERROR_CODE *error_code)
 
                 if (string_view_equals_c_str(&arg_pair[0], "left"))
                 {
-                    String_View prefix;
-                    string_view_create_c_str(&prefix, PREFIX, 0, UINT32_MAX);
+                    String path;
+                    string_create_sv(&path, &arg_pair[1]);
 
-                    String path = string_concat_sv(&prefix, &arg_pair[1]);
                     res.skybox.left_tex_path = path.c_str;
                     IC_DEBUG_OPTION_SET(options, 0);
                 }
                 else if (string_view_equals_c_str(&arg_pair[0], "right"))
                 {
-                    String_View prefix;
-                    string_view_create_c_str(&prefix, PREFIX, 0, UINT32_MAX);
+                    String path;
+                    string_create_sv(&path, &arg_pair[1]);
 
-                    String path = string_concat_sv(&prefix, &arg_pair[1]);
                     res.skybox.right_tex_path = path.c_str;
                     IC_DEBUG_OPTION_SET(options, 1);
                 }
                 else if (string_view_equals_c_str(&arg_pair[0], "bottom"))
                 {
-                    String_View prefix;
-                    string_view_create_c_str(&prefix, PREFIX, 0, UINT32_MAX);
+                    String path;
+                    string_create_sv(&path, &arg_pair[1]);
 
-                    String path = string_concat_sv(&prefix, &arg_pair[1]);
                     res.skybox.bottom_tex_path = path.c_str;
                     IC_DEBUG_OPTION_SET(options, 2);
                 }
                 else if (string_view_equals_c_str(&arg_pair[0], "top"))
                 {
-                    String_View prefix;
-                    string_view_create_c_str(&prefix, PREFIX, 0, UINT32_MAX);
+                    String path;
+                    string_create_sv(&path, &arg_pair[1]);
 
-                    String path = string_concat_sv(&prefix, &arg_pair[1]);
                     res.skybox.top_tex_path = path.c_str;
                     IC_DEBUG_OPTION_SET(options, 3);
                 }
                 else if (string_view_equals_c_str(&arg_pair[0], "front"))
                 {
-                    String_View prefix;
-                    string_view_create_c_str(&prefix, PREFIX, 0, UINT32_MAX);
+                    String path;
+                    string_create_sv(&path, &arg_pair[1]);
 
-                    String path = string_concat_sv(&prefix, &arg_pair[1]);
                     res.skybox.front_tex_path = path.c_str;
                     IC_DEBUG_OPTION_SET(options, 4);
                 }
                 else if (string_view_equals_c_str(&arg_pair[0], "back"))
                 {
-                    String_View prefix;
-                    string_view_create_c_str(&prefix, PREFIX, 0, UINT32_MAX);
+                    String path;
+                    string_create_sv(&path, &arg_pair[1]);
 
-                    String path = string_concat_sv(&prefix, &arg_pair[1]);
                     res.skybox.back_tex_path = path.c_str;
                     IC_DEBUG_OPTION_SET(options, 5);
                 }

@@ -5,9 +5,11 @@
 #include"util/Utils.h"
 #include"util/Vector.h"
 #include"Log.h"
+#include"IC_Config.h"
 
 #include<stdio.h>
 #include<stdlib.h>
+#include<string.h>
 
 #ifdef IC_WINDOWS
     #include<Windows.h>
@@ -17,17 +19,25 @@
 
 const int MAX_BUFFER_SIZE = 256;
 
-String read_source(const char *path, IC_ERROR_CODE *error_code)
+String read_source(const char *rel_path, IC_ERROR_CODE *error_code)
 {
     String res;
     res.c_str = NULL;
     res.length = 0;
 
-    FILE *file = fopen(path, "r");
+    String_View work_dir;
+    String_View rel_path_sv;
+    string_view_create_c_str(&work_dir, IC_WORKING_DIRECTORY, 0, UINT32_MAX);
+    string_view_create_c_str(&rel_path_sv, rel_path, 0, UINT32_MAX);
 
+    String path = string_concat_sv(&work_dir, &rel_path_sv);
+
+    FILE *file = fopen(path.c_str, "r");
+    
     if (!file)
     {
-        log_trace("Error opening source at '%s'", path);
+        log_trace("Error opening source at '%s'", path.c_str);
+        string_destroy(&path);
         if (error_code) *error_code = IC_READ_OPEN_FILE_ERROR;
         return res;
     }
@@ -37,6 +47,7 @@ String read_source(const char *path, IC_ERROR_CODE *error_code)
     if (ec != IC_NO_ERROR)
     {
         fclose(file);
+        string_destroy(&path);
         if (error_code) *error_code = ec;
         return res;
     }
@@ -54,11 +65,16 @@ String read_source(const char *path, IC_ERROR_CODE *error_code)
     vector_add(&chars, &NULL_TERMINATOR);
 
     res.c_str = (char*)chars.arr;
-    log_assert(chars.arr != NULL, "Error reading source file at '%s'. Out of memory", path);
+    if (chars.arr == NULL)
+    {
+        string_destroy(&path);
+        log_assert(IC_FALSE, "Error reading source file at '%s'. Out of memory", path.c_str);
+    }
     
     if (fclose(file) != 0)
     {
-        log_trace("Error closing source file at '%s'. Returning contents anyway.", path);
+        log_trace("Error closing source file at '%s'. Returning contents anyway.", path.c_str);
+        string_destroy(&path);
         if (error_code) *error_code = IC_READ_CLOSE_FILE_ERROR;
     }
     else

@@ -1,6 +1,8 @@
 #include"world/model/skybox/Skybox.h"
 
+#include"util/String.h"
 #include"Log.h"
+#include"IC_Config.h"
 
 #include<glad/glad.h>
 
@@ -89,7 +91,15 @@ IC_ERROR_CODE skybox_create(Skybox *dest)
         int width, height, comp;
 
         // Get pixels from texture file
-        unsigned char *pixels = stbi_load(tex_sources[i], &width, &height, &comp, STBI_rgb_alpha);
+        String_View work_dir;
+        String_View rel_path;
+        string_view_create_c_str(&work_dir, IC_WORKING_DIRECTORY, 0, UINT32_MAX);
+        string_view_create_c_str(&rel_path, tex_sources[i], 0, UINT32_MAX);
+        String path = string_concat_sv(&work_dir, &rel_path);
+
+        unsigned char *pixels = stbi_load(path.c_str, &width, &height, &comp, STBI_rgb_alpha);
+        string_destroy(&path);
+
         if (pixels == NULL)
         {
             log_trace("Error creating skybox. Loading texture at '%s' unsuccessful", tex_sources[i]);

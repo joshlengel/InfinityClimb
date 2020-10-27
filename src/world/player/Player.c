@@ -9,8 +9,6 @@
 #include<stdlib.h>
 #include<math.h>
 
-extern const char *PREFIX;
-
 #ifdef IC_DEBUG
 const char *SPHERE_OPTION_NAMES[4] =
 {
@@ -313,11 +311,9 @@ Player player_load_from_file(const char *path, IC_ERROR_CODE *error_code)
 
                 if (string_view_equals_c_str(&arg_pair[0], "path"))
                 {
-                    String_View prefix;
-                    string_view_create_c_str(&prefix, PREFIX, 0, UINT32_MAX);
-
-                    String path = string_concat_sv(&prefix, &arg_pair[1]);
-
+                    String path;
+                    string_create_sv(&path, &arg_pair[1]);
+                    
                     player.mesh = mesh_load_from_obj(path.c_str, &ec);
                     if (ec != IC_NO_ERROR)
                     {

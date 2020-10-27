@@ -41,6 +41,10 @@ set(sources
 list(TRANSFORM sources PREPEND "${IC_ROOT}/src/")
 include_directories("${IC_ROOT}/include" "${IC_ROOT}/src")
 
+set(IC_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/")
+configure_file("${IC_ROOT}/include/IC_Config.h.in" "${IC_ROOT}/bin/generated_headers/IC_Config.h")
+include_directories("${IC_ROOT}/bin/generated_headers")
+
 # Dependencies
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)

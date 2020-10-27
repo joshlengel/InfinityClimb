@@ -5,8 +5,6 @@
 
 #include<stdlib.h>
 
-extern const char *PREFIX;
-
 const char *SKYBOX_V_PATH = "assets/shaders/skybox.vert";
 const char *SKYBOX_F_PATH = "assets/shaders/skybox.frag";
 
@@ -14,21 +12,10 @@ IC_ERROR_CODE skybox_shader_create(Skybox_Shader *dest)
 {
     IC_ERROR_CODE ec;
 
-    String_View prefix;
-    String_View v_path_sv;
-    String_View f_path_sv;
-    string_view_create_c_str(&prefix, PREFIX, 0, UINT32_MAX);
-    string_view_create_c_str(&v_path_sv, SKYBOX_V_PATH, 0, UINT32_MAX);
-    string_view_create_c_str(&f_path_sv, SKYBOX_F_PATH, 0, UINT32_MAX);
-
-    String v_path = string_concat_sv(&prefix, &v_path_sv);
-    String v_src = read_source(v_path.c_str, &ec);
-    string_destroy(&v_path);
+    String v_src = read_source(SKYBOX_V_PATH, &ec);
     if (ec != IC_NO_ERROR) return ec;
 
-    String f_path = string_concat_sv(&prefix, &f_path_sv);
-    String f_src = read_source(f_path.c_str, &ec);
-    string_destroy(&f_path);
+    String f_src = read_source(SKYBOX_F_PATH, &ec);
     if (ec != IC_NO_ERROR)
     {
         string_destroy(&v_src);

@@ -57,7 +57,7 @@ void game_state_start(State *state)
 
     // Level
     IC_ERROR_CODE ec;
-    data->level = level_load_from_file("../../../assets/components/level1.iclevel", &ec);
+    data->level = level_load_from_file("assets/components/level1.iclevel", &ec);
     if (ec != IC_NO_ERROR)
     {
         state->exit = IC_TRUE;
