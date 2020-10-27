@@ -58,6 +58,10 @@ include_directories("${IC_DEPS}/glad/include")
 include_directories("${IC_DEPS}/stb")
 
 # Build
-set(EXECUTABLE_OUTPUT_PATH "${IC_ROOT}/bin/${CMAKE_SYSTEM_NAME}/${CMAKE_BUILD_TYPE}")
+if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    set(EXECUTABLE_OUTPUT_PATH "${IC_ROOT}/bin/${CMAKE_SYSTEM_NAME}")
+else (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    set(EXECUTABLE_OUTPUT_PATH "${IC_ROOT}/bin/${CMAKE_SYSTEM_NAME}/${CMAKE_BUILD_TYPE}")
+endif (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 add_executable(InfinityClimb ${sources})
 target_link_libraries(InfinityClimb glfw glad)
