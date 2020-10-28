@@ -452,8 +452,9 @@ void player_controller_update(const Player_Controller *controller, const Input *
     }
     else
     {
-        if (input_key_pressed(input, controller->up_key))
+        if (input_key_pressed(input, controller->up_key) &&  controller->player->hit_ground)
         {
+            controller->player->hit_ground = IC_FALSE;
             player_move_up(controller->player, controller->y_speed);
         }
     }
