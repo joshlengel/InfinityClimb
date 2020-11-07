@@ -13,6 +13,7 @@
 
 typedef struct _Mesh Mesh;
 typedef struct _Model Model;
+typedef struct _Target Target;
 
 typedef struct _Mesh_Shader Mesh_Shader;
 typedef struct _Skybox_Shader Skybox_Shader;
@@ -20,8 +21,11 @@ typedef struct _Skybox_Shader Skybox_Shader;
 struct _Level
 {
     uint32_t num_models;
-    const Mesh *meshes;
-    const Model *models;
+    Mesh *meshes;
+    Model *models;
+
+    uint32_t num_targets;
+    Target *targets;
 
     Skybox skybox;
 

@@ -4,6 +4,8 @@ object path=assets/models/floor.obj  color=777777FF position_x=0.0   position_y=
 object path=assets/models/stairs.obj color=888888FF position_x=0.25  position_y=0.6 position_z=0.5 scale_x=0.4 scale_y=0.4 scale_z=0.4
 object path=assets/models/box.obj    color=888888FF position_x=-0.75 position_y=0.6 position_z=0.1 scale_x=0.6 scale_y=0.4 scale_z=0.8
 
+target path=assets/models/target.obj color=EE9999FF position_x=-7.0  position_y=2.0 position_z=8.0 scale_x=1.0 scale_y=1.0 scale_z=1.0
+
 skybox left=assets/textures/left.png right=assets/textures/right.png bottom=assets/textures/bottom.png top=assets/textures/top.png front=assets/textures/front.png back=assets/textures/back.png size=500
 
 light direction_x=-0.4 direction_y=-0.8 direction_z=0.6 color=FFFFFFFF

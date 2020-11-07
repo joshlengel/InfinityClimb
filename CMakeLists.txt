@@ -33,6 +33,7 @@ set(sources
     "world/model/skybox/Skybox.c"
     "world/model/skybox/Skybox_Shader.c"
     "world/player/Player.c"
+    "world/target/Target.c"
     "state/State.c"
     "state/Start_State.c"
     "state/Game_State.c"

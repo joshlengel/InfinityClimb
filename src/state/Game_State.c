@@ -134,34 +134,34 @@ void game_state_update(State *state)
         input_toggle_cursor(state->input);
     }
 
-    // Check for player mode and perspective changes
-    if (input_key_pressed(state->input, IC_KEY_M))
-    {
-        if (data->level.player.type == IC_PLAYER_NORMAL)
-        {
-            data->level.player.type = IC_PLAYER_SUPER;
-        }
-        else
-        {
-            data->level.player.type = IC_PLAYER_NORMAL;
-        }
-    }
-
-    if (input_key_pressed(state->input, IC_KEY_P))
-    {
-        if (data->level.player.perspective == IC_PLAYER_THIRD_PERSON)
-        {
-            data->level.player.perspective = IC_PLAYER_FIRST_PERSON;
-        }
-        else
-        {
-            data->level.player.perspective = IC_PLAYER_THIRD_PERSON;
-        }
-    }
-
     if (!input_cursor_enabled(state->input))
     {
         float dt = timer_get_dt(state->timer);
+
+        // Check for player mode and perspective changes
+        if (input_key_pressed(state->input, IC_KEY_M))
+        {
+            if (data->level.player.type == IC_PLAYER_NORMAL)
+            {
+                data->level.player.type = IC_PLAYER_SUPER;
+            }
+            else
+            {
+                data->level.player.type = IC_PLAYER_NORMAL;
+            }
+        }
+
+        if (input_key_pressed(state->input, IC_KEY_P))
+        {
+            if (data->level.player.perspective == IC_PLAYER_THIRD_PERSON)
+            {
+                data->level.player.perspective = IC_PLAYER_FIRST_PERSON;
+            }
+            else
+            {
+                data->level.player.perspective = IC_PLAYER_THIRD_PERSON;
+            }
+        }
 
         // Player movement
         player_controller_update(&data->player_controller, state->input, dt);
