@@ -22,6 +22,7 @@ set(sources
     "util/math/Mat.c"
     "window/Window.c"
     "window/Input.c"
+    "window/Keyset.c"
     "window/Context.c"
     "world/Camera.c"
     "world/Level.c"

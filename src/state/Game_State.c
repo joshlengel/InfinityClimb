@@ -2,6 +2,7 @@
 
 #include"window/Context.h"
 #include"window/Input.h"
+#include"window/Keyset.h"
 #include"world/model/mesh/Mesh_Shader.h"
 #include"world/model/skybox/Skybox_Shader.h"
 #include"world/player/Player.h"
@@ -34,9 +35,23 @@ struct _Game_State_Data
     Color floor_color;
     Color stair_color;
     Color box_color;
+
+    Keyset keyset;
 };
 
 typedef struct _Game_State_Data Game_State_Data;
+
+void __game_state_update_keyset_impl(State *state)
+{
+    Game_State_Data *data = (Game_State_Data*)state->data;
+
+    data->player_controller.forward_key  = data->keyset.forward;
+    data->player_controller.backward_key = data->keyset.backward;
+    data->player_controller.right_key    = data->keyset.right;
+    data->player_controller.left_key     = data->keyset.left;
+    data->player_controller.up_key       = data->keyset.up;
+    data->player_controller.down_key     = data->keyset.down;
+}
 
 void game_state_start(State *state)
 {
@@ -79,12 +94,15 @@ void game_state_start(State *state)
     data->player_controller.y_speed = 6.0f;
     data->player_controller.mouse_sensitivity = 0.001f;
 
-    data->player_controller.forward_key  = IC_KEY_W;
-    data->player_controller.backward_key = IC_KEY_S;
-    data->player_controller.right_key    = IC_KEY_D;
-    data->player_controller.left_key     = IC_KEY_A;
-    data->player_controller.up_key       = IC_KEY_SPACE;
-    data->player_controller.down_key     = IC_KEY_SHIFT;
+    data->keyset = keyset_load("assets/components/keyset1.ickeyset", &ec);
+    if (ec != IC_NO_ERROR)
+    {
+        state->exit = IC_TRUE;
+        state->next_state = NULL;
+        return;
+    }
+
+    __game_state_update_keyset_impl(state);
 
     // Loader
     data->loader.num_resources = 4;
@@ -140,7 +158,9 @@ void game_state_update(State *state)
         float dt = timer_get_dt(state->timer);
 
         // Check for player mode and perspective changes
-        if (input_key_pressed(state->input, IC_KEY_M))
+
+        // TODO: This is only for debugging/testing purposes
+        if (input_key_pressed(state->input, IC_KEY_M)) 
         {
             if (data->level.player.type == IC_PLAYER_NORMAL)
             {
@@ -152,7 +172,7 @@ void game_state_update(State *state)
             }
         }
 
-        if (input_key_pressed(state->input, IC_KEY_P))
+        if (input_key_pressed(state->input, data->keyset.switch_perspectives))
         {
             if (data->level.player.perspective == IC_PLAYER_THIRD_PERSON)
             {
@@ -164,7 +184,7 @@ void game_state_update(State *state)
             }
         }
 
-        if (input_key_pressed(state->input, IC_KEY_ENTER))
+        if (input_key_pressed(state->input, data->keyset.shoot))
         {
             level_shoot(&data->level);
         }

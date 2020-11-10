@@ -369,6 +369,14 @@ Level level_load_from_file(const char *path, IC_ERROR_CODE *error_code)
                     target.model.scale.z = strtof(arg_pair[1].c_str, NULL);
                     IC_DEBUG_OPTION_SET(options, 7);
                 }
+                else if (string_view_equals_c_str(&arg_pair[0], "yaw"))
+                {
+                    target.model.rotation_axis.x = 0.0f;
+                    target.model.rotation_axis.y = 1.0f;
+                    target.model.rotation_axis.z = 0.0f;
+                    target.model.rotation = strtof(arg_pair[1].c_str, NULL);
+                    // Optional
+                }
                 else
                 {
                     log_trace("Warning on line %u at '%s': Unrecognized option '%.*s' for target", l + 1, path, arg_pair[0].length, arg_pair[0].c_str);

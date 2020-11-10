@@ -1,0 +1,9 @@
+forward     key=W
+backward    key=S
+left        key=A
+right       key=D
+up/jump     key=Space
+down        key=Shift
+
+shoot       key=Q
+perspective key=P
