@@ -57,7 +57,21 @@ void __player_check_required_options_impl(IC_OPTIONS_32 options, uint8_t num_opt
 
 IC_ERROR_CODE player_create(Player *dest)
 {
-    return mesh_create(&dest->mesh);
+    IC_ERROR_CODE ec;
+
+    if ((ec = mesh_create(&dest->mesh)) != IC_NO_ERROR)
+        return ec;
+    
+    dest->crosshairs.texture_path = "assets/textures/crosshairs.png";
+    dest->crosshairs.scale = 0.1f;
+    
+    if ((ec = crosshairs_create(&dest->crosshairs)) != IC_NO_ERROR)
+    {
+        mesh_destroy(&dest->mesh);
+        return ec;
+    }
+
+    return IC_NO_ERROR;
 }
 
 void player_move_forward(Player *player, float speed)
@@ -266,17 +280,17 @@ Player player_load_from_file(const char *path, IC_ERROR_CODE *error_code)
 
                 if (string_view_equals_c_str(&arg_pair[0], "offset_x"))
                 {
-                    player.cam_offset.x = strtof(arg_pair[1].c_str, NULL);
+                    player.ray_cast_offset.x = player.cam_offset.x = strtof(arg_pair[1].c_str, NULL);
                     IC_DEBUG_OPTION_SET(options, 0);
                 }
                 else if (string_view_equals_c_str(&arg_pair[0], "offset_y"))
                 {
-                    player.cam_offset.y = strtof(arg_pair[1].c_str, NULL);
+                    player.ray_cast_offset.y = player.cam_offset.y = strtof(arg_pair[1].c_str, NULL);
                     IC_DEBUG_OPTION_SET(options, 1);
                 }
                 else if (string_view_equals_c_str(&arg_pair[0], "offset_z"))
                 {
-                    player.cam_offset.z = strtof(arg_pair[1].c_str, NULL);
+                    player.ray_cast_offset.z = player.cam_offset.z = strtof(arg_pair[1].c_str, NULL);
                     IC_DEBUG_OPTION_SET(options, 2);
                 }
                 else
@@ -414,6 +428,7 @@ void player_destroy(const Player *player)
 {
     free(player->collidable);
     mesh_destroy(&player->mesh);
+    crosshairs_destroy(&player->crosshairs);
 }
 
 void player_controller_update(const Player_Controller *controller, const Input *input, float dt)

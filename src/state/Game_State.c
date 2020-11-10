@@ -54,6 +54,7 @@ void game_state_start(State *state)
     data->context.clear_depth = IC_TRUE;
     data->context.cull = IC_TRUE;
     data->context.cull_front = IC_FALSE;
+    data->context.depth_test = IC_TRUE;
 
     // Level
     IC_ERROR_CODE ec;
@@ -108,7 +109,7 @@ void game_state_start(State *state)
     context_update(&data->context);
 
     // Start
-    //input_disable_cursor(state->input);
+    input_disable_cursor(state->input);
 }
 
 void game_state_stop(State *state)
@@ -134,7 +135,7 @@ void game_state_update(State *state)
         input_toggle_cursor(state->input);
     }
 
-    if (input_cursor_enabled(state->input))
+    if (!input_cursor_enabled(state->input))
     {
         float dt = timer_get_dt(state->timer);
 
@@ -182,6 +183,14 @@ void game_state_render(State *state)
     context_clear(&data->context);
 
     data->context.cull_front = IC_TRUE;
+    data->context.depth_test = IC_TRUE;
+    data->context.blending = IC_FALSE;
     context_update(&data->context);
     level_render(&data->level, state->window, &data->camera);
+
+    data->context.depth_test = IC_FALSE;
+    data->context.cull = IC_FALSE;
+    data->context.blending = IC_TRUE;
+    context_update(&data->context);
+    crosshairs_render(&data->level.player.crosshairs, state->window);
 }
