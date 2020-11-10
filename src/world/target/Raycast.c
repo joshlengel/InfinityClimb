@@ -4,6 +4,7 @@
 #include"world/model/mesh/Mesh.h"
 
 #include<math.h>
+#include<stdio.h>
 
 RaycastResult raycast_check_target(const Vec3 *ray_origin, const Vec3 *ray_direction, float ray_length, const Target *target)
 {

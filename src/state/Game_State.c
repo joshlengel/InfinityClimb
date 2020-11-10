@@ -108,7 +108,7 @@ void game_state_start(State *state)
     context_update(&data->context);
 
     // Start
-    input_disable_cursor(state->input);
+    //input_disable_cursor(state->input);
 }
 
 void game_state_stop(State *state)
@@ -134,7 +134,7 @@ void game_state_update(State *state)
         input_toggle_cursor(state->input);
     }
 
-    if (!input_cursor_enabled(state->input))
+    if (input_cursor_enabled(state->input))
     {
         float dt = timer_get_dt(state->timer);
 
@@ -161,6 +161,11 @@ void game_state_update(State *state)
             {
                 data->level.player.perspective = IC_PLAYER_THIRD_PERSON;
             }
+        }
+
+        if (input_key_pressed(state->input, IC_KEY_ENTER))
+        {
+            level_shoot(&data->level);
         }
 
         // Player movement

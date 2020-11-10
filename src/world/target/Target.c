@@ -8,7 +8,7 @@
 
 Target target_load(const char *mesh_path, IC_ERROR_CODE *error_code)
 {
-    Target res = {0};
+    Target res = {.active=IC_TRUE};
 
     Mesh *mesh = malloc(sizeof(Mesh));
     IC_ERROR_CODE ec;

@@ -45,6 +45,8 @@ struct _Player
     float cam_dist; // Only for third person
     float cam_pitch, cam_yaw;
 
+    Vec3 ray_cast_offset; // Used for shooting
+
     Player_Perspective perspective;
 };
 

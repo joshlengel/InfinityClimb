@@ -463,7 +463,7 @@ void player_controller_update(const Player_Controller *controller, const Input *
     {
     case IC_PLAYER_FIRST_PERSON:
         controller->player->yaw = controller->player->cam_yaw;
-        controller->player->pitch = 0;
+        controller->player->pitch = controller->player->cam_pitch;
         break;
 
     case IC_PLAYER_THIRD_PERSON:
@@ -519,14 +519,11 @@ void player_controller_update(const Player_Controller *controller, const Input *
 
 Mat4 player_transform_matrix(const Player *player)
 {
-    Vec3 pitch_axis = { -1.0f, 0.0f, 0.0f };
-    Vec3 yaw_axis = { 0.0f, 1.0f, 0.0f };
-    Mat4 rot_pitch = mat4_make_axis_angle(&pitch_axis, player->pitch);
+    Vec3 yaw_axis = { 0.0f, -1.0f, 0.0f };
     Mat4 rot_yaw = mat4_make_axis_angle(&yaw_axis, player->yaw + (float)IC_PI);
 
     Mat4 translate = mat4_make_translate(player->position.x + player->mesh_offset.x, player->position.y + player->mesh_offset.y, player->position.z + player->mesh_offset.z);
 
-    Mat4 res = mat4_mul(&rot_pitch, &rot_yaw);
-    res = mat4_mul(&translate, &res);
+    Mat4 res = mat4_mul(&translate, &rot_yaw);
     return res;
 }

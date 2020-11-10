@@ -9,12 +9,14 @@
 #include"world/model/skybox/Skybox_Shader.h"
 #include"world/model/Model.h"
 #include"world/target/Target.h"
+#include"world/target/Raycast.h"
 
 #include"util/Utils.h"
 #include"util/Vector.h"
 #include"Log.h"
 
 #include<stdlib.h>
+#include<math.h>
 
 #ifdef IC_DEBUG
 const char *PLAYER_OPTION_NAMES[6] =
@@ -299,7 +301,7 @@ Level level_load_from_file(const char *path, IC_ERROR_CODE *error_code)
         }
         else if (string_view_equals_c_str(&parts[0], "target"))
         {
-            Target target = {0};
+            Target target;
 
             IC_DEBUG_OPTIONS_32(options)
 
@@ -647,10 +649,13 @@ void level_render(const Level *level, const Window *window, const Camera *camera
     const Target *target_itr = level->targets;
     for (uint32_t i = 0; i < level->num_targets; ++i)
     {
-        Mat4 model_transform = model_transform_matrix(&target_itr->model);
-        mesh_shader_set_transform(level->mesh_shader, &model_transform);
-        mesh_shader_set_color(level->mesh_shader, &target_itr->model.color);
-        model_render(&target_itr->model);
+        if (target_itr->active) 
+        {
+            Mat4 model_transform = model_transform_matrix(&target_itr->model);
+            mesh_shader_set_transform(level->mesh_shader, &model_transform);
+            mesh_shader_set_color(level->mesh_shader, &target_itr->model.color);
+            model_render(&target_itr->model);
+        }
 
         ++target_itr;
     }
@@ -660,4 +665,38 @@ void level_render(const Level *level, const Window *window, const Camera *camera
     mesh_shader_set_transform(level->mesh_shader, &player_transform);
     mesh_shader_set_color(level->mesh_shader, &player_color);
     mesh_render(&level->player.mesh);    
+}
+
+void level_shoot(Level *level)
+{
+    // Find ray
+    Vec3 ray_origin = vec3_add(&level->player.position, &level->player.ray_cast_offset);
+    float cos_pitch = cosf(level->player.pitch);
+    Vec3 ray_direction =
+    {
+        sinf(level->player.yaw) * cos_pitch,
+        sinf(level->player.pitch),
+        cosf(level->player.yaw) * cos_pitch
+    };
+
+    RaycastResult res = { .collision=IC_FALSE, .distance=INFINITY };
+    Target *hit = NULL;
+
+    Target *itr = level->targets;
+    for (uint32_t i = 0; i < level->num_targets; ++i)
+    {
+        RaycastResult c_res = raycast_check_target(&ray_origin, &ray_direction, 10.0f, itr);
+        if (c_res.distance < res.distance)
+        {
+            res = c_res;
+            hit = itr;
+        }
+
+        ++itr;
+    }
+
+    if (res.collision)
+    {
+        hit->active = IC_FALSE;
+    }
 }
