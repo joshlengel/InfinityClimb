@@ -57,7 +57,21 @@ void __player_check_required_options_impl(IC_OPTIONS_32 options, uint8_t num_opt
 
 IC_ERROR_CODE player_create(Player *dest)
 {
-    return mesh_create(&dest->mesh);
+    IC_ERROR_CODE ec;
+
+    if ((ec = mesh_create(&dest->mesh)) != IC_NO_ERROR)
+        return ec;
+    
+    dest->crosshairs.texture_path = "assets/textures/crosshairs.png";
+    dest->crosshairs.scale = 0.1f;
+    
+    if ((ec = crosshairs_create(&dest->crosshairs)) != IC_NO_ERROR)
+    {
+        mesh_destroy(&dest->mesh);
+        return ec;
+    }
+
+    return IC_NO_ERROR;
 }
 
 void player_move_forward(Player *player, float speed)
@@ -266,17 +280,17 @@ Player player_load_from_file(const char *path, IC_ERROR_CODE *error_code)
 
                 if (string_view_equals_c_str(&arg_pair[0], "offset_x"))
                 {
-                    player.cam_offset.x = strtof(arg_pair[1].c_str, NULL);
+                    player.ray_cast_offset.x = player.cam_offset.x = strtof(arg_pair[1].c_str, NULL);
                     IC_DEBUG_OPTION_SET(options, 0);
                 }
                 else if (string_view_equals_c_str(&arg_pair[0], "offset_y"))
                 {
-                    player.cam_offset.y = strtof(arg_pair[1].c_str, NULL);
+                    player.ray_cast_offset.y = player.cam_offset.y = strtof(arg_pair[1].c_str, NULL);
                     IC_DEBUG_OPTION_SET(options, 1);
                 }
                 else if (string_view_equals_c_str(&arg_pair[0], "offset_z"))
                 {
-                    player.cam_offset.z = strtof(arg_pair[1].c_str, NULL);
+                    player.ray_cast_offset.z = player.cam_offset.z = strtof(arg_pair[1].c_str, NULL);
                     IC_DEBUG_OPTION_SET(options, 2);
                 }
                 else
@@ -414,6 +428,7 @@ void player_destroy(const Player *player)
 {
     free(player->collidable);
     mesh_destroy(&player->mesh);
+    crosshairs_destroy(&player->crosshairs);
 }
 
 void player_controller_update(const Player_Controller *controller, const Input *input, float dt)
@@ -463,7 +478,7 @@ void player_controller_update(const Player_Controller *controller, const Input *
     {
     case IC_PLAYER_FIRST_PERSON:
         controller->player->yaw = controller->player->cam_yaw;
-        controller->player->pitch = 0;
+        controller->player->pitch = controller->player->cam_pitch;
         break;
 
     case IC_PLAYER_THIRD_PERSON:
@@ -519,14 +534,11 @@ void player_controller_update(const Player_Controller *controller, const Input *
 
 Mat4 player_transform_matrix(const Player *player)
 {
-    Vec3 pitch_axis = { -1.0f, 0.0f, 0.0f };
-    Vec3 yaw_axis = { 0.0f, 1.0f, 0.0f };
-    Mat4 rot_pitch = mat4_make_axis_angle(&pitch_axis, player->pitch);
+    Vec3 yaw_axis = { 0.0f, -1.0f, 0.0f };
     Mat4 rot_yaw = mat4_make_axis_angle(&yaw_axis, player->yaw + (float)IC_PI);
 
     Mat4 translate = mat4_make_translate(player->position.x + player->mesh_offset.x, player->position.y + player->mesh_offset.y, player->position.z + player->mesh_offset.z);
 
-    Mat4 res = mat4_mul(&rot_pitch, &rot_yaw);
-    res = mat4_mul(&translate, &res);
+    Mat4 res = mat4_mul(&translate, &rot_yaw);
     return res;
 }

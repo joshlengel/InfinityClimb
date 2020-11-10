@@ -17,8 +17,6 @@ IC_ERROR_CODE context_create(Context *dest)
     dest->data = data;
     log_assert(data != NULL, "Error creating context. Out of memory");
 
-    glEnable(GL_DEPTH_TEST);
-
     context_update(dest);
 
     return IC_NO_ERROR;
@@ -56,6 +54,20 @@ void context_update(const Context *context)
         glDisable(GL_CULL_FACE);
     }
     
+    if (context->depth_test)
+        glEnable(GL_DEPTH_TEST);
+    else
+        glDisable(GL_DEPTH_TEST);
+    
+    if (context->blending)
+    {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+    else
+    {
+        glDisable(GL_BLEND);
+    }
 }
 
 void context_clear(const Context *context)

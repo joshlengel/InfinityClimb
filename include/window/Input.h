@@ -48,7 +48,8 @@ typedef int IC_MOUSE_BUTTON;
 #define IC_KEY_SPACE  40
 #define IC_KEY_SHIFT  41
 #define IC_KEY_ESCAPE 42
-#define IC_KEY_LAST   43
+#define IC_KEY_ENTER  43
+#define IC_KEY_LAST   44
 
 #define IC_MOUSE_BUTTON_LEFT   0
 #define IC_MOUSE_BUTTON_RIGHT  1
