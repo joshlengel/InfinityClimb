@@ -12,6 +12,8 @@ struct _Context
     const Color *background_color;
 
     IC_BOOL cull, cull_front;
+    IC_BOOL depth_test;
+    IC_BOOL blending;
 
     Context_Data *data;
 };

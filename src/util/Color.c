@@ -36,9 +36,9 @@ Color color_create_hex(uint32_t hex)
 {
     Color res =
     {
-        .red=(uint8_t)(hex >> 24 & 0xFF),
-        .green=(uint8_t)(hex >> 16 & 0xFF),
-        .blue=(uint8_t)(hex >> 8 & 0xFF),
+        .red=(uint8_t)((hex >> 24) & 0xFF),
+        .green=(uint8_t)((hex >> 16) & 0xFF),
+        .blue=(uint8_t)((hex >> 8) & 0xFF),
         .alpha=(uint8_t)(hex & 0xFF)
     };
     

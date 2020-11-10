@@ -1,5 +1,6 @@
 #pragma once
 
+#include"world/player/Crosshairs.h"
 #include"world/model/physics/Collidable.h"
 #include"world/model/mesh/Mesh.h"
 
@@ -25,6 +26,7 @@ typedef enum _Player_Perspective Player_Perspective;
 
 struct _Player
 {
+    // Player state
     Vec3 position;
     Vec3 velocity;
     Vec3 acceleration;
@@ -33,19 +35,25 @@ struct _Player
     float pitch, yaw;
 
     Player_Type type;
+    Player_Perspective perspective;
 
+    // Physics
     void *collidable;
     Collidable collidable_type;
     Vec3 collidable_offset;
 
+    // Renderable
     Mesh mesh;
     Vec3 mesh_offset;
+    Crosshairs crosshairs;
 
+    // Camera
     Vec3 cam_offset;
     float cam_dist; // Only for third person
     float cam_pitch, cam_yaw;
 
-    Player_Perspective perspective;
+    // Raycasting
+    Vec3 ray_cast_offset; // Used for shooting
 };
 
 typedef struct _Player Player;

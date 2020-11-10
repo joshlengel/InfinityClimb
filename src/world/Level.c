@@ -8,12 +8,15 @@
 #include"world/model/skybox/Skybox.h"
 #include"world/model/skybox/Skybox_Shader.h"
 #include"world/model/Model.h"
+#include"world/target/Target.h"
+#include"world/target/Raycast.h"
 
 #include"util/Utils.h"
 #include"util/Vector.h"
 #include"Log.h"
 
 #include<stdlib.h>
+#include<math.h>
 
 #ifdef IC_DEBUG
 const char *PLAYER_OPTION_NAMES[6] =
@@ -22,6 +25,11 @@ const char *PLAYER_OPTION_NAMES[6] =
 };
 
 const char *OBJECT_OPTION_NAMES[8] =
+{
+    "path", "color", "position_x", "position_y", "position_z", "scale_x", "scale_y", "scale_z"
+};
+
+const char *TARGET_OPTION_NAMES[8] =
 {
     "path", "color", "position_x", "position_y", "position_z", "scale_x", "scale_y", "scale_z"
 };
@@ -83,6 +91,7 @@ Level level_load_from_file(const char *path, IC_ERROR_CODE *error_code)
 
     Vector meshes = {.elem_size=sizeof(Mesh), .init_capacity=5};
     Vector models = {.elem_size=sizeof(Model), .init_capacity=5};
+    Vector targets = {.elem_size=sizeof(Target), .init_capacity=5};
     ec = vector_create(&meshes);
     if (ec != IC_NO_ERROR)
     {
@@ -96,6 +105,16 @@ Level level_load_from_file(const char *path, IC_ERROR_CODE *error_code)
     {
         string_destroy(&source_str);
         vector_destroy(&meshes);
+        if (error_code) *error_code = ec;
+        return res;
+    }
+
+    ec = vector_create(&targets);
+    if (ec != IC_NO_ERROR)
+    {
+        string_destroy(&source_str);
+        vector_destroy(&meshes);
+        vector_destroy(&models);
         if (error_code) *error_code = ec;
         return res;
     }
@@ -280,6 +299,89 @@ Level level_load_from_file(const char *path, IC_ERROR_CODE *error_code)
 
             vector_add(&models, &model);
         }
+        else if (string_view_equals_c_str(&parts[0], "target"))
+        {
+            Target target;
+
+            IC_DEBUG_OPTIONS_32(options)
+
+            for (uint32_t i = 1; i < num_parts; ++i)
+            {
+                uint32_t num_arg_pair;
+                String_View *arg_pair = string_view_split(&parts[i], '=', &num_arg_pair);
+
+                if (num_arg_pair == 0) // Incorrect syntax
+                {
+                    log_trace("Warning on line %u at '%s': '%.*s' is incorrect syntax", l + 1, path, parts[i].length, parts[i].c_str);
+                    free(arg_pair);
+                    if (error_code) *error_code = IC_LEVEL_SYNTAX_ERROR;
+                    continue;
+                }
+
+                if (string_view_equals_c_str(&arg_pair[0], "path"))
+                {
+                    String path;
+                    string_create_sv(&path, &arg_pair[1]);
+
+                    target = target_load(path.c_str, &ec);
+                    if (ec != IC_NO_ERROR)
+                    {
+                        free(arg_pair);
+                        string_destroy(&path);
+                        continue;
+                    }
+
+                    string_destroy(&path);
+                    IC_DEBUG_OPTION_SET(options, 0);
+                }
+                else if (string_view_equals_c_str(&arg_pair[0], "color"))
+                {
+                    target.model.color = color_create_hex((uint32_t)strtoul(arg_pair[1].c_str, NULL, 16)); // base 16 <=> hex
+                    IC_DEBUG_OPTION_SET(options, 1);
+                }
+                else if (string_view_equals_c_str(&arg_pair[0], "position_x"))
+                {
+                    target.model.position.x = strtof(arg_pair[1].c_str, NULL);
+                    IC_DEBUG_OPTION_SET(options, 2);
+                }
+                else if (string_view_equals_c_str(&arg_pair[0], "position_y"))
+                {
+                    target.model.position.y = strtof(arg_pair[1].c_str, NULL);
+                    IC_DEBUG_OPTION_SET(options, 3);
+                }
+                else if (string_view_equals_c_str(&arg_pair[0], "position_z"))
+                {
+                    target.model.position.z = strtof(arg_pair[1].c_str, NULL);
+                    IC_DEBUG_OPTION_SET(options, 4);
+                }
+                else if (string_view_equals_c_str(&arg_pair[0], "scale_x"))
+                {
+                    target.model.scale.x = strtof(arg_pair[1].c_str, NULL);
+                    IC_DEBUG_OPTION_SET(options, 5);
+                }
+                else if (string_view_equals_c_str(&arg_pair[0], "scale_y"))
+                {
+                    target.model.scale.y = strtof(arg_pair[1].c_str, NULL);
+                    IC_DEBUG_OPTION_SET(options, 6);
+                }
+                else if (string_view_equals_c_str(&arg_pair[0], "scale_z"))
+                {
+                    target.model.scale.z = strtof(arg_pair[1].c_str, NULL);
+                    IC_DEBUG_OPTION_SET(options, 7);
+                }
+                else
+                {
+                    log_trace("Warning on line %u at '%s': Unrecognized option '%.*s' for target", l + 1, path, arg_pair[0].length, arg_pair[0].c_str);
+                    if (error_code) *error_code = IC_LEVEL_SYNTAX_ERROR;
+                }
+
+                free(arg_pair);
+            }
+
+            __check_required_options(options, 8, "target", TARGET_OPTION_NAMES, l, path, error_code);
+
+            vector_add(&targets, &target);
+        }
         else if (string_view_equals_c_str(&parts[0], "skybox"))
         {
             IC_DEBUG_OPTIONS_32(options)
@@ -441,17 +543,27 @@ Level level_load_from_file(const char *path, IC_ERROR_CODE *error_code)
     res.meshes = (Mesh*)meshes.arr;
     res.models = (Model*)models.arr;
 
+    res.num_targets = targets.size;
+    res.targets = (Target*)targets.arr;
+
     return res;
 }
 
 IC_ERROR_CODE level_create(Level *level)
 {
-    level->_loader.num_resources = level->num_models + 2;
+    level->_loader.num_resources = level->num_models + level->num_targets + 2;
     loader_create(&level->_loader);
     
+    Mesh *mesh_itr = level->meshes;
     for (uint32_t i = 0; i < level->num_models; ++i)
     {
-        loader_add_resource(&level->_loader, (Mesh*)level->meshes + i, (Loader_Init_proc)mesh_create, (Loader_Dest_proc)mesh_destroy);
+        loader_add_resource(&level->_loader, mesh_itr++, (Loader_Init_proc)mesh_create, (Loader_Dest_proc)mesh_destroy);
+    }
+
+    Target *target_itr = level->targets;
+    for (uint32_t i = 0; i < level->num_targets; ++i)
+    {
+        loader_add_resource(&level->_loader, target_itr++, (Loader_Init_proc)target_create, (Loader_Dest_proc)target_destroy);
     }
 
     loader_add_resource(&level->_loader, &level->player, (Loader_Init_proc)player_create, (Loader_Dest_proc)player_destroy);
@@ -476,6 +588,7 @@ void level_destroy(const Level *level)
 
     free((void*)level->meshes);
     free((void*)level->models);
+    free((void*)level->targets);
 }
 
 void level_update(Level *level, Camera *camera, float dt)
@@ -522,15 +635,29 @@ void level_render(const Level *level, const Window *window, const Camera *camera
     mesh_shader_set_view(level->mesh_shader, &view);
     mesh_shader_set_projection(level->mesh_shader, &projection);
 
-    const Model *itr = level->models;
+    const Model *model_itr = level->models;
     for (uint32_t i = 0; i < level->num_models; ++i)
     {
-        Mat4 model_transform = model_transform_matrix(itr);
+        Mat4 model_transform = model_transform_matrix(model_itr);
         mesh_shader_set_transform(level->mesh_shader, &model_transform);
-        mesh_shader_set_color(level->mesh_shader, &itr->color);
-        model_render(itr);
+        mesh_shader_set_color(level->mesh_shader, &model_itr->color);
+        model_render(model_itr);
 
-        ++itr;
+        ++model_itr;
+    }
+
+    const Target *target_itr = level->targets;
+    for (uint32_t i = 0; i < level->num_targets; ++i)
+    {
+        if (target_itr->active) 
+        {
+            Mat4 model_transform = model_transform_matrix(&target_itr->model);
+            mesh_shader_set_transform(level->mesh_shader, &model_transform);
+            mesh_shader_set_color(level->mesh_shader, &target_itr->model.color);
+            model_render(&target_itr->model);
+        }
+
+        ++target_itr;
     }
 
     Mat4 player_transform = player_transform_matrix(&level->player);
@@ -538,4 +665,38 @@ void level_render(const Level *level, const Window *window, const Camera *camera
     mesh_shader_set_transform(level->mesh_shader, &player_transform);
     mesh_shader_set_color(level->mesh_shader, &player_color);
     mesh_render(&level->player.mesh);    
+}
+
+void level_shoot(Level *level)
+{
+    // Find ray
+    Vec3 ray_origin = vec3_add(&level->player.position, &level->player.ray_cast_offset);
+    float cos_pitch = cosf(level->player.pitch);
+    Vec3 ray_direction =
+    {
+        sinf(level->player.yaw) * cos_pitch,
+        sinf(level->player.pitch),
+        cosf(level->player.yaw) * cos_pitch
+    };
+
+    RaycastResult res = { .collision=IC_FALSE, .distance=INFINITY };
+    Target *hit = NULL;
+
+    Target *itr = level->targets;
+    for (uint32_t i = 0; i < level->num_targets; ++i)
+    {
+        RaycastResult c_res = raycast_check_target(&ray_origin, &ray_direction, 10.0f, itr);
+        if (c_res.distance < res.distance)
+        {
+            res = c_res;
+            hit = itr;
+        }
+
+        ++itr;
+    }
+
+    if (res.collision)
+    {
+        hit->active = IC_FALSE;
+    }
 }

@@ -54,6 +54,7 @@ void game_state_start(State *state)
     data->context.clear_depth = IC_TRUE;
     data->context.cull = IC_TRUE;
     data->context.cull_front = IC_FALSE;
+    data->context.depth_test = IC_TRUE;
 
     // Level
     IC_ERROR_CODE ec;
@@ -134,34 +135,39 @@ void game_state_update(State *state)
         input_toggle_cursor(state->input);
     }
 
-    // Check for player mode and perspective changes
-    if (input_key_pressed(state->input, IC_KEY_M))
-    {
-        if (data->level.player.type == IC_PLAYER_NORMAL)
-        {
-            data->level.player.type = IC_PLAYER_SUPER;
-        }
-        else
-        {
-            data->level.player.type = IC_PLAYER_NORMAL;
-        }
-    }
-
-    if (input_key_pressed(state->input, IC_KEY_P))
-    {
-        if (data->level.player.perspective == IC_PLAYER_THIRD_PERSON)
-        {
-            data->level.player.perspective = IC_PLAYER_FIRST_PERSON;
-        }
-        else
-        {
-            data->level.player.perspective = IC_PLAYER_THIRD_PERSON;
-        }
-    }
-
     if (!input_cursor_enabled(state->input))
     {
         float dt = timer_get_dt(state->timer);
+
+        // Check for player mode and perspective changes
+        if (input_key_pressed(state->input, IC_KEY_M))
+        {
+            if (data->level.player.type == IC_PLAYER_NORMAL)
+            {
+                data->level.player.type = IC_PLAYER_SUPER;
+            }
+            else
+            {
+                data->level.player.type = IC_PLAYER_NORMAL;
+            }
+        }
+
+        if (input_key_pressed(state->input, IC_KEY_P))
+        {
+            if (data->level.player.perspective == IC_PLAYER_THIRD_PERSON)
+            {
+                data->level.player.perspective = IC_PLAYER_FIRST_PERSON;
+            }
+            else
+            {
+                data->level.player.perspective = IC_PLAYER_THIRD_PERSON;
+            }
+        }
+
+        if (input_key_pressed(state->input, IC_KEY_ENTER))
+        {
+            level_shoot(&data->level);
+        }
 
         // Player movement
         player_controller_update(&data->player_controller, state->input, dt);
@@ -177,6 +183,14 @@ void game_state_render(State *state)
     context_clear(&data->context);
 
     data->context.cull_front = IC_TRUE;
+    data->context.depth_test = IC_TRUE;
+    data->context.blending = IC_FALSE;
     context_update(&data->context);
     level_render(&data->level, state->window, &data->camera);
+
+    data->context.depth_test = IC_FALSE;
+    data->context.cull = IC_FALSE;
+    data->context.blending = IC_TRUE;
+    context_update(&data->context);
+    crosshairs_render(&data->level.player.crosshairs, state->window);
 }

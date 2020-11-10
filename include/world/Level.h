@@ -13,6 +13,7 @@
 
 typedef struct _Mesh Mesh;
 typedef struct _Model Model;
+typedef struct _Target Target;
 
 typedef struct _Mesh_Shader Mesh_Shader;
 typedef struct _Skybox_Shader Skybox_Shader;
@@ -20,8 +21,11 @@ typedef struct _Skybox_Shader Skybox_Shader;
 struct _Level
 {
     uint32_t num_models;
-    const Mesh *meshes;
-    const Model *models;
+    Mesh *meshes;
+    Model *models;
+
+    uint32_t num_targets;
+    Target *targets;
 
     Skybox skybox;
 
@@ -45,5 +49,6 @@ void level_destroy(const Level *level);
 
 void level_update(Level *level, Camera *camera, float dt);
 void level_render(const Level *level, const Window *window, const Camera *camera);
+void level_shoot(Level *level);
 
 Level level_load_from_file(const char *path, IC_ERROR_CODE *error_code);
