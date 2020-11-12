@@ -17,7 +17,7 @@
     #include<sys/time.h>
 #endif // IC_WINDOWS
 
-const int MAX_BUFFER_SIZE = 256;
+static const int MAX_BUFFER_SIZE = 256;
 
 String read_source(const char *rel_path, IC_ERROR_CODE *error_code)
 {
@@ -127,7 +127,7 @@ void loader_add_resource(const Loader *loader, void *resource, Loader_Init_proc 
     loader->data->index += 3;
 }
 
-void __loader_fail_impl(Loader *loader, uint32_t index, void **itr)
+static void __loader_fail_impl(Loader *loader, uint32_t index, void **itr)
 {
     do
     {
@@ -199,7 +199,7 @@ IC_ERROR_CODE timer_create(Timer *dest)
 void timer_destroy(const Timer *timer)
 {}
 
-uint64_t __timer_get_time_impl()
+static uint64_t __timer_get_time_impl()
 {
 #ifdef IC_LINUX
     struct timeval now;

@@ -7,7 +7,7 @@
 
 #include<string.h>
 
-const int IC_TO_GLFW_KEY[IC_KEY_LAST] =
+static const int IC_TO_GLFW_KEY[IC_KEY_LAST] =
 {
     GLFW_KEY_A,
     GLFW_KEY_B,
@@ -55,7 +55,7 @@ const int IC_TO_GLFW_KEY[IC_KEY_LAST] =
     GLFW_KEY_ENTER
 };
 
-const int IC_TO_GLFW_MOUSE_BUTTON[IC_MOUSE_BUTTON_LAST] =
+static const int IC_TO_GLFW_MOUSE_BUTTON[IC_MOUSE_BUTTON_LAST] =
 {
     GLFW_MOUSE_BUTTON_LEFT,
     GLFW_MOUSE_BUTTON_RIGHT,

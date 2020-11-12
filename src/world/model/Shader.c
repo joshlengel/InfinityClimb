@@ -138,7 +138,7 @@ void shader_declare_uniform(const Shader *shader, const char *name)
 }
 
 // Utility function
-GLint __get_uniform_location_impl(const Shader *shader, const char *name)
+static GLint __get_uniform_location_impl(const Shader *shader, const char *name)
 {
     Uniform_Location_Pair *pair = shader->data->uniform_locations;
 

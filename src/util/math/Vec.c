@@ -62,7 +62,7 @@ Vec4 vec4_negate(const Vec4 *v)
     Vec4 res = { -v->x, -v->y, -v->z, -v->w }; return res;
 }
 
-float __abs_impl(float v)
+static float __abs_impl(float v)
 {
     return v < 0.0f? -v : v;
 }

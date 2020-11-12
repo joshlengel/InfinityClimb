@@ -19,37 +19,37 @@
 #include<math.h>
 
 #ifdef IC_DEBUG
-const char *PLAYER_OPTION_NAMES[6] =
+static const char *const PLAYER_OPTION_NAMES[6] =
 {
     "path", "start_x", "start_y", "start_z", "start_pitch", "start_yaw"
 };
 
-const char *OBJECT_OPTION_NAMES[8] =
+static const char *const OBJECT_OPTION_NAMES[8] =
 {
     "path", "color", "position_x", "position_y", "position_z", "scale_x", "scale_y", "scale_z"
 };
 
-const char *TARGET_OPTION_NAMES[8] =
+static const char *const TARGET_OPTION_NAMES[8] =
 {
     "path", "color", "position_x", "position_y", "position_z", "scale_x", "scale_y", "scale_z"
 };
 
-const char *SKYBOX_OPTION_NAMES[7] =
+static const char *const SKYBOX_OPTION_NAMES[7] =
 {
     "left", "right", "bottom", "top", "front", "back", "size"
 };
 
-const char *LIGHT_OPTION_NAMES[4] =
+static const char *const LIGHT_OPTION_NAMES[4] =
 {
     "direction_x", "direction_y", "direction_z", "color"
 };
 
-const char *LEVEL_IDENTIFIER_NAMES[3] =
+static const char *const LEVEL_IDENTIFIER_NAMES[3] =
 {
     "player", "skybox", "light"
 };
 
-void __level_check_required_options_impl(IC_OPTIONS_32 options, uint8_t num_options, const char *part_name, const char **option_names, uint32_t line, const char *path, IC_ERROR_CODE *error_code)
+static void __level_check_required_options_impl(IC_OPTIONS_32 options, uint8_t num_options, const char *part_name, const char **option_names, uint32_t line, const char *path, IC_ERROR_CODE *error_code)
 {
     for (uint8_t i = 0; i < num_options; ++i)
     {

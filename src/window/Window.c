@@ -8,7 +8,7 @@
 
 #include<stdlib.h>
 
-void window_resize_callback(GLFWwindow *glfw_window, int width, int height)
+static void __window_resize_callback_impl(GLFWwindow *glfw_window, int width, int height)
 {
     glViewport(0, 0, width, height);
 
@@ -46,7 +46,7 @@ IC_ERROR_CODE window_create(Window *dest)
         return IC_WINDOW_GL_CONTEXT_ERROR;
     }
 
-    glfwSetWindowSizeCallback(data->handle, window_resize_callback);
+    glfwSetWindowSizeCallback(data->handle, __window_resize_callback_impl);
 
     return IC_NO_ERROR;
 }

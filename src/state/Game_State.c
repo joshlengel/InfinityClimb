@@ -41,7 +41,7 @@ struct _Game_State_Data
 
 typedef struct _Game_State_Data Game_State_Data;
 
-void __game_state_update_keyset_impl(State *state)
+static void __game_state_update_keyset_impl(State *state)
 {
     Game_State_Data *data = (Game_State_Data*)state->data;
 
