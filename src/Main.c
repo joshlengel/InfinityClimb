@@ -14,13 +14,13 @@
 #include<stdio.h>
 #include<stdlib.h>
 
-Window window;
-Input input;
-Timer timer;
+static Window window;
+static Input input;
+static Timer timer;
 
-Loader window_loader;
+static Loader window_loader;
 
-IC_ERROR_CODE init()
+static IC_ERROR_CODE init()
 {
     IC_ERROR_CODE ec;
 

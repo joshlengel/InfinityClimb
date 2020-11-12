@@ -13,7 +13,7 @@
 
 static Vector log_str = {.elem_size=sizeof(char), .init_capacity=1000};
 
-const char *months[] =
+static const char *const MONTHS[] =
 {
     "Jan",
     "Feb",
@@ -29,8 +29,8 @@ const char *months[] =
     "Dec"
 };
 
-const char NULL_TERMINATOR = '\0';
-const char NEWLINE = '\n';
+static const char NULL_TERMINATOR = '\0';
+static const char NEWLINE = '\n';
 
 IC_ERROR_CODE log_init()
 {
@@ -50,7 +50,7 @@ void log_terminate()
     vector_destroy(&log_str);
 }
 
-void __log_impl(const char *fmt, va_list args)
+static void __log_impl(const char *fmt, va_list args)
 {
     uint32_t rem_size = log_str.capacity - log_str.size + 1;
     
@@ -69,7 +69,7 @@ void __log_impl(const char *fmt, va_list args)
     log_str.size = size;
 }
 
-void __log_vargs_impl(const char *fmt, ...)
+static void __log_vargs_impl(const char *fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
@@ -84,7 +84,7 @@ void log_trace(const char *fmt, ...)
     struct tm local_time = *localtime(&t);
     const char *prefix_fmt = "[%02d %s %d - %02d:%02d:%02d] ";
     
-    __log_vargs_impl(prefix_fmt, local_time.tm_mday, months[local_time.tm_mon], local_time.tm_year + 1900, local_time.tm_hour, local_time.tm_min, local_time.tm_sec);
+    __log_vargs_impl(prefix_fmt, local_time.tm_mday, MONTHS[local_time.tm_mon], local_time.tm_year + 1900, local_time.tm_hour, local_time.tm_min, local_time.tm_sec);
 
     va_list args;
     va_start(args, fmt);

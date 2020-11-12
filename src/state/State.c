@@ -4,7 +4,7 @@
 
 #include<stdlib.h>
 
-IC_BOOL __state_check_exit_impl(State_Machine *state_machine)
+static IC_BOOL __state_check_exit_impl(State_Machine *state_machine)
 {
     State *current = state_machine->current_state;
 

@@ -10,32 +10,32 @@
 #include<math.h>
 
 #ifdef IC_DEBUG
-const char *SPHERE_OPTION_NAMES[4] =
+static const char *const SPHERE_OPTION_NAMES[4] =
 {
     "radius", "offset_x", "offset_y", "offset_z"
 };
 
-const char *CAPSULE_OPTION_NAMES[5] =
+static const char *const CAPSULE_OPTION_NAMES[5] =
 {
     "radius", "body_height", "offset_x", "offset_y", "offset_z"
 };
 
-const char *CAMERA_OPTION_NAMES[3] =
+static const char *const CAMERA_OPTION_NAMES[3] =
 {
     "offset_x", "offset_y", "offset_z"
 };
 
-const char *MESH_OPTION_NAMES[4] =
+static const char *const MESH_OPTION_NAMES[4] =
 {
     "path", "offset_x", "offset_y", "offset_z"
 };
 
-const char *PLAYER_IDENTIFIER_NAMES[3] =
+static const char *const PLAYER_IDENTIFIER_NAMES[3] =
 {
     "collidable", "camera", "mesh"
 };
 
-void __player_check_required_options_impl(IC_OPTIONS_32 options, uint8_t num_options, const char *part_name, const char **option_names, uint32_t line, const char *path, IC_ERROR_CODE *error_code)
+static void __player_check_required_options_impl(IC_OPTIONS_32 options, uint8_t num_options, const char *part_name, const char **option_names, uint32_t line, const char *path, IC_ERROR_CODE *error_code)
 {
     for (uint8_t i = 0; i < num_options; ++i)
     {

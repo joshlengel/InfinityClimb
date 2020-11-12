@@ -5,7 +5,7 @@
 
 #include<math.h>
 
-Vec3 closest_to_line(const Vec3 *a, const Vec3 *b, const Vec3 *point)
+static Vec3 __closest_to_line_impl(const Vec3 *a, const Vec3 *b, const Vec3 *point)
 {
     Vec3 ab = vec3_sub(b, a);
     Vec3 ap = vec3_sub(point, a);
@@ -18,7 +18,7 @@ Vec3 closest_to_line(const Vec3 *a, const Vec3 *b, const Vec3 *point)
     return vec3_add(a, &d_ab);
 }
 
-Collision_Result __collide_sphere_with_triangle_impl(const Sphere *sphere, Vec3 center, const Player *player, Vec3 p0, Vec3 p1, Vec3 p2, float rad_sqr, Vec3 N)
+static Collision_Result __collide_sphere_with_triangle_impl(const Sphere *sphere, Vec3 center, const Player *player, Vec3 p0, Vec3 p1, Vec3 p2, float rad_sqr, Vec3 N)
 {
     Collision_Result result;
     result.displacement.x = 0.0f;
@@ -49,17 +49,17 @@ Collision_Result __collide_sphere_with_triangle_impl(const Sphere *sphere, Vec3 
 
     IC_BOOL intersects = IC_FALSE;
 
-    Vec3 projected_edge0 = closest_to_line(&p0, &p1, &center);
+    Vec3 projected_edge0 = __closest_to_line_impl(&p0, &p1, &center);
     Vec3 v0 = vec3_sub(&center, &projected_edge0);
     float dist_sqr0 = vec3_length_sqr(&v0);
     intersects |= dist_sqr0 < rad_sqr;
 
-    Vec3 projected_edge1 = closest_to_line(&p1, &p2, &center);
+    Vec3 projected_edge1 = __closest_to_line_impl(&p1, &p2, &center);
     Vec3 v1 = vec3_sub(&center, &projected_edge1);
     float dist_sqr1 = vec3_length_sqr(&v1);
     intersects |= dist_sqr1 < rad_sqr;
 
-    Vec3 projected_edge2 = closest_to_line(&p2, &p0, &center);
+    Vec3 projected_edge2 = __closest_to_line_impl(&p2, &p0, &center);
     Vec3 v2 = vec3_sub(&center, &projected_edge2);
     float dist_sqr2 = vec3_length_sqr(&v2);
     intersects |= dist_sqr2 < rad_sqr;
@@ -256,7 +256,7 @@ Collision_Result collide_capsule_with_static(const Capsule *capsule, const Model
         {
             float min_dist = INFINITY;
 
-            Vec3 projected_edge0 = closest_to_line(&p0, &p1, &line_plane_intersection);
+            Vec3 projected_edge0 = __closest_to_line_impl(&p0, &p1, &line_plane_intersection);
             Vec3 v0 = vec3_sub(&line_plane_intersection, &projected_edge0);
             float dist_sqr0 = vec3_length_sqr(&v0);
             if (dist_sqr0 < min_dist)
@@ -265,7 +265,7 @@ Collision_Result collide_capsule_with_static(const Capsule *capsule, const Model
                 ref_point = projected_edge0;
             }
 
-            Vec3 projected_edge1 = closest_to_line(&p1, &p2, &line_plane_intersection);
+            Vec3 projected_edge1 = __closest_to_line_impl(&p1, &p2, &line_plane_intersection);
             Vec3 v1 = vec3_sub(&line_plane_intersection, &projected_edge1);
             float dist_sqr1 = vec3_length_sqr(&v1);
             if (dist_sqr1 < min_dist)
@@ -274,7 +274,7 @@ Collision_Result collide_capsule_with_static(const Capsule *capsule, const Model
                 ref_point = projected_edge1;
             }
 
-            Vec3 projected_edge2 = closest_to_line(&p2, &p0, &line_plane_intersection);
+            Vec3 projected_edge2 = __closest_to_line_impl(&p2, &p0, &line_plane_intersection);
             Vec3 v2 = vec3_sub(&line_plane_intersection, &projected_edge2);
             float dist_sqr2 = vec3_length_sqr(&v2);
             if (dist_sqr2 < min_dist)
@@ -284,7 +284,7 @@ Collision_Result collide_capsule_with_static(const Capsule *capsule, const Model
             }
         }
 
-        Vec3 center = closest_to_line(&A, &B, &ref_point);
+        Vec3 center = __closest_to_line_impl(&A, &B, &ref_point);
         Sphere sphere = { capsule->radius };
 
         Collision_Result res_tri = __collide_sphere_with_triangle_impl(&sphere, center, player, p0, p1, p2, rad_sqr, N);

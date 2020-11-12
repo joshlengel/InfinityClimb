@@ -9,8 +9,8 @@
 #include<glad/glad.h>
 #include<stb_image.h>
 
-const char *CROSSHAIRS_V_PATH = "assets/shaders/crosshairs.vert";
-const char *CROSSHAIRS_F_PATH = "assets/shaders/crosshairs.frag";
+static const char *const CROSSHAIRS_V_PATH = "assets/shaders/crosshairs.vert";
+static const char *const CROSSHAIRS_F_PATH = "assets/shaders/crosshairs.frag";
 
 struct _Crosshairs_Data
 {

@@ -6,17 +6,17 @@
 
 #ifdef IC_DEBUG
 
-static const char *KEYSET_IDENTIFIER_NAMES[] =
+static const char *const KEYSET_IDENTIFIER_NAMES[] =
 {
     "forward", "backward", "left", "right", "up/jump", "down", "shoot", "perspective"
 };
 
-static const char *KEYSET_OPTION_NAMES[1] =
+static const char *const KEYSET_OPTION_NAMES[1] =
 {
     "key"
 };
 
-void __keyset_check_required_options_impl(IC_OPTIONS_32 options, uint8_t num_options, const char *part_name, const char **option_names, uint32_t line, const char *path, IC_ERROR_CODE *error_code)
+static void __keyset_check_required_options_impl(IC_OPTIONS_32 options, uint8_t num_options, const char *part_name, const char **option_names, uint32_t line, const char *path, IC_ERROR_CODE *error_code)
 {
     for (uint8_t i = 0; i < num_options; ++i)
     {
@@ -83,7 +83,7 @@ static const Key_Map_Element KEY_MAP[] =
 
 static const uint32_t KEY_MAP_LENGTH = sizeof(KEY_MAP) / sizeof(Key_Map_Element);
 
-void __keyset_check_key_impl(uint32_t num_parts, String_View *parts, Keyset *res, uint32_t line, const char *path, IC_ERROR_CODE *error_code, const char *key_name, IC_KEY *key_dest)
+static void __keyset_check_key_impl(uint32_t num_parts, String_View *parts, Keyset *res, uint32_t line, const char *path, IC_ERROR_CODE *error_code, const char *key_name, IC_KEY *key_dest)
 {
     IC_DEBUG_OPTIONS_32(options)
 
