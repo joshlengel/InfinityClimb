@@ -129,6 +129,8 @@ IC_ERROR_CODE crosshairs_create(Crosshairs *dest)
 
     shader_declare_uniform(&data->shader, "scale");
     shader_declare_uniform(&data->shader, "aspect_ratio");
+
+    return IC_NO_ERROR;
 }
 
 void crosshairs_destroy(const Crosshairs *crosshairs)

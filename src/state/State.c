@@ -12,8 +12,8 @@ IC_BOOL __state_check_exit_impl(State_Machine *state_machine)
 
     if (current->exit)
     {
-        State *next = current->next_state;
         current->stop_proc(current);
+        State *next = current->next_state;
         
         if (next)
         {

@@ -1,4 +1,5 @@
 #include"Log_Mmt.h"
+#include"gui/Gui_Lib.h"
 
 #include"Core.h"
 
@@ -12,13 +13,19 @@ IC_ERROR_CODE load_libs()
         return IC_WINDOW_LIB_LOAD_ERROR;
     }
 
-    log_init();
+    if (log_init() != IC_NO_ERROR)
+    {
+        glfwTerminate();
+        return IC_LOG_LIB_LOAD_ERROR;
+    }
 
     return IC_NO_ERROR;
 }
 
 void terminate_libs()
 {
+    gui_terminate_lib();
+    
     log_terminate();
 
     glfwTerminate();
