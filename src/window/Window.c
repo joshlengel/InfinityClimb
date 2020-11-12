@@ -8,9 +8,13 @@
 
 #include<stdlib.h>
 
-void window_resize_callback(GLFWwindow *window, int width, int height)
+void window_resize_callback(GLFWwindow *glfw_window, int width, int height)
 {
     glViewport(0, 0, width, height);
+
+    Window *window = (Window*)glfwGetWindowUserPointer(glfw_window);
+    window->width = (uint32_t)width;
+    window->height = (uint32_t)height;
 }
 
 IC_ERROR_CODE window_create(Window *dest)
@@ -27,6 +31,8 @@ IC_ERROR_CODE window_create(Window *dest)
         free(data);
         return IC_WINDOW_CREATE_ERROR;
     }
+
+    glfwSetWindowUserPointer(data->handle, dest);
 
     // Center window in screen
     const GLFWvidmode *primary_monitor = glfwGetVideoMode(glfwGetPrimaryMonitor());

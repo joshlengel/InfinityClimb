@@ -40,12 +40,22 @@ set(sources
     "state/State.c"
     "state/Start_State.c"
     "state/Game_State.c"
+    "gui/Gui_Shader.c"
+    "gui/Gui_Lib.c"
+    "gui/Gui_Utils.c"
+    "gui/components/Component.c"
 )
 
 list(TRANSFORM sources PREPEND "${IC_ROOT}/src/")
 include_directories("${IC_ROOT}/include" "${IC_ROOT}/src")
 
-set(IC_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/")
+if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    set(EXECUTABLE_OUTPUT_PATH "${IC_ROOT}/bin/${CMAKE_SYSTEM_NAME}")
+else (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    set(EXECUTABLE_OUTPUT_PATH "${IC_ROOT}/bin/${CMAKE_SYSTEM_NAME}/${CMAKE_BUILD_TYPE}")
+endif (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+
+file(RELATIVE_PATH IC_WORKING_DIRECTORY "${EXECUTABLE_OUTPUT_PATH}" "${IC_ROOT}")
 configure_file("${IC_ROOT}/include/IC_Config.h.in" "${IC_ROOT}/bin/generated_headers/IC_Config.h")
 include_directories("${IC_ROOT}/bin/generated_headers")
 
@@ -62,10 +72,5 @@ include_directories("${IC_DEPS}/glad/include")
 include_directories("${IC_DEPS}/stb")
 
 # Build
-if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-    set(EXECUTABLE_OUTPUT_PATH "${IC_ROOT}/bin/${CMAKE_SYSTEM_NAME}")
-else (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-    set(EXECUTABLE_OUTPUT_PATH "${IC_ROOT}/bin/${CMAKE_SYSTEM_NAME}/${CMAKE_BUILD_TYPE}")
-endif (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 add_executable(InfinityClimb ${sources})
 target_link_libraries(InfinityClimb glfw glad)

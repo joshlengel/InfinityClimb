@@ -5,8 +5,8 @@
 
 #include<stdlib.h>
 
-const char *SKYBOX_V_PATH = "assets/shaders/skybox.vert";
-const char *SKYBOX_F_PATH = "assets/shaders/skybox.frag";
+static const char *const SKYBOX_V_PATH = "assets/shaders/skybox.vert";
+static const char *const SKYBOX_F_PATH = "assets/shaders/skybox.frag";
 
 IC_ERROR_CODE skybox_shader_create(Skybox_Shader *dest)
 {

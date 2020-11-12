@@ -4,8 +4,8 @@
 #include"util/Color.h"
 #include"util/math/Mat.h"
 
-const char *MESH_V_PATH = "assets/shaders/mesh.vert";
-const char *MESH_F_PATH = "assets/shaders/mesh.frag";
+static const char *const MESH_V_PATH = "assets/shaders/mesh.vert";
+static const char *const MESH_F_PATH = "assets/shaders/mesh.frag";
 
 IC_ERROR_CODE mesh_shader_create(Mesh_Shader *dest)
 {
