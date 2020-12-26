@@ -16,7 +16,7 @@ static const char *const KEYSET_OPTION_NAMES[1] =
     "key"
 };
 
-static void __keyset_check_required_options_impl(IC_OPTIONS_32 options, uint8_t num_options, const char *part_name, const char **option_names, uint32_t line, const char *path, IC_ERROR_CODE *error_code)
+static void __keyset_check_required_options_impl(IC_OPTIONS_32 options, uint8_t num_options, const char *part_name, const char *const *option_names, uint32_t line, const char *path, IC_ERROR_CODE *error_code)
 {
     for (uint8_t i = 0; i < num_options; ++i)
     {

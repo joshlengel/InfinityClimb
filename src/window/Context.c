@@ -6,6 +6,8 @@
 
 #include<stdlib.h>
 
+static const Color DEFAULT = { .red_f=0.0f, .green_f=0.0f, .blue_f=0.0f, .alpha_f=1.0f };
+
 struct _Context_Data
 {
     GLbitfield clear_mask;
@@ -34,11 +36,13 @@ void context_update(const Context *context)
     if (context->clear_color) context->data->clear_mask |= GL_COLOR_BUFFER_BIT;
     if (context->clear_depth) context->data->clear_mask |= GL_DEPTH_BUFFER_BIT;
 
+    const Color *clear_color = context->background_color? context->background_color : &DEFAULT;
+
     glClearColor(
-        context->background_color->red_f,
-        context->background_color->green_f,
-        context->background_color->blue_f,
-        context->background_color->alpha_f);
+        clear_color->red_f,
+        clear_color->green_f,
+        clear_color->blue_f,
+        clear_color->alpha_f);
     
     if (context->cull)
     {

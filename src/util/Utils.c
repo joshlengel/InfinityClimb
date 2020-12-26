@@ -67,8 +67,8 @@ String read_source(const char *rel_path, IC_ERROR_CODE *error_code)
     res.c_str = (char*)chars.arr;
     if (chars.arr == NULL)
     {
-        string_destroy(&path);
         log_assert(IC_FALSE, "Error reading source file at '%s'. Out of memory", path.c_str);
+        string_destroy(&path);
     }
     
     if (fclose(file) != 0)
@@ -81,6 +81,8 @@ String read_source(const char *rel_path, IC_ERROR_CODE *error_code)
     {
         if (error_code) *error_code = IC_NO_ERROR;
     }
+
+    string_destroy(&path);
 
     return res;
 }

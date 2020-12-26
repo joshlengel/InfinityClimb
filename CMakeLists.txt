@@ -43,6 +43,9 @@ set(sources
     "gui/Gui_Shader.c"
     "gui/Gui_Lib.c"
     "gui/Gui_Utils.c"
+    "gui/text/Font.c"
+    "gui/text/Text.c"
+    "gui/text/Text_Shader.c"
     "gui/components/Component.c"
 )
 
